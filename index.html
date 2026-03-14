@@ -10,994 +10,868 @@
   <style>
     /* ─── TOKENS ──────────────────────────────────────────────── */
     :root {
-      --spruce:    #2C3E2D;
-      --pine:      #3B4F3C;
-      --birch:     #C4A882;
-      --bark:      #8B6F47;
-      --fog:       #E8E0D4;
-      --snow:      #F5F0E8;
-      --glacier:   #6B8FA3;
-      --rust:      #A0522D;
-      --dusk:      #1A1F1A;
-      --cream:     #FAF6EF;
-
-      /* ── HERO BACKGROUND ─────────────────────────────────────────
-         Change this single variable to swap the whole hero backdrop.
-         Accepts any CSS background value:
-           • A URL:     url('your-photo.jpg')
-           • A color:   #2C3E2D
-           • A gradient (see default below)
-         ──────────────────────────────────────────────────────────── */
-      --hero-bg: linear-gradient(180deg,
-        #1B2A35 0%, #2C4A5A 18%, #3B6070 30%,
-        #4A7B8C 40%, #5C6E50 52%, #3B4F3C 65%,
-        #2C3E2D 80%, #1E2B1F 100%
-      );
-
-      --font-display: 'Playfair Display', Georgia, serif;
-      --font-stamp:   'Special Elite', monospace;
-      --font-body:    'Nunito', sans-serif;
-
-      --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --spruce:  #2C3E2D;
+      --birch:   #C4A882;
+      --bark:    #8B6F47;
+      --fog:     #E8E0D4;
+      --snow:    #F5F0E8;
+      --rust:    #A0522D;
+      --dusk:    #1A1F1A;
+      --cream:   #FAF6EF;
+      --hero-bg: linear-gradient(180deg,#1B2A35 0%,#2C4A5A 18%,#3B6070 30%,#4A7B8C 40%,#5C6E50 52%,#3B4F3C 65%,#2C3E2D 80%,#1E2B1F 100%);
+      --ease:    cubic-bezier(0.25,0.46,0.45,0.94);
+      --font-d:  'Playfair Display', Georgia, serif;
+      --font-s:  'Special Elite', monospace;
+      --font-b:  'Nunito', sans-serif;
     }
-
-    /* ─── RESET ───────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body {
-      background: var(--cream);
-      color: var(--dusk);
-      font-family: var(--font-body);
-      font-weight: 400;
-      overflow-x: hidden;
-      cursor: default;
-    }
-    img { display: block; width: 100%; object-fit: cover; }
+    body { background: var(--cream); color: var(--dusk); font-family: var(--font-b); overflow-x: hidden; }
+    img  { display: block; width: 100%; object-fit: cover; }
 
-    /* ─── GRAIN OVERLAY ───────────────────────────────────────── */
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.035;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9998; opacity: 0.032;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 200px 200px;
     }
 
-    /* ─── NAV / LOGO ──────────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.4rem 2.5rem;
-      mix-blend-mode: normal;
-    }
-    nav::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(26,31,26,0.55) 0%, transparent 100%);
-      pointer-events: none;
-    }
-    .logo {
-      font-family: var(--font-stamp);
-      font-size: clamp(1.4rem, 3vw, 1.9rem);
-      letter-spacing: 0.28em;
-      color: var(--snow);
-      text-shadow: 0 1px 6px rgba(0,0,0,0.4);
-      position: relative;
-      z-index: 1;
-    }
-    .nav-tag {
-      font-family: var(--font-body);
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--birch);
-      position: relative;
-      z-index: 1;
-    }
+    /* ─── NAV ─────────────────────────────────────────────────── */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 2.5rem; }
+    nav::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(26,31,26,.55), transparent); pointer-events: none; }
+    .logo    { font-family: var(--font-s); font-size: clamp(1.4rem,3vw,1.9rem); letter-spacing: .28em; color: var(--snow); text-shadow: 0 1px 6px rgba(0,0,0,.4); position: relative; z-index: 1; }
+    .nav-tag { font-family: var(--font-b); font-size: .65rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--birch); position: relative; z-index: 1; }
 
     /* ─── HERO ────────────────────────────────────────────────── */
-    #hero {
-      position: relative;
-      height: 100svh;
-      min-height: 600px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      overflow: hidden;
-    }
-    .hero-media {
-      position: absolute;
-      inset: 0;
-    }
-    /* Painted Alaska landscape placeholder */
-    .hero-placeholder {
-      width: 100%; height: 100%;
-      background: var(--hero-bg);
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      overflow: hidden;
-    }
-    /* Aurora bands */
+    #hero { position: relative; height: 100svh; min-height: 600px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; overflow: hidden; }
+    .hero-media { position: absolute; inset: 0; }
+    .hero-placeholder { width: 100%; height: 100%; background: var(--hero-bg); background-size: cover; background-position: center; position: relative; overflow: hidden; }
     .hero-placeholder::before {
-      content: '';
-      position: absolute;
-      top: 5%; left: -20%;
-      width: 140%; height: 45%;
-      background: 
-        radial-gradient(ellipse 80% 40% at 50% 50%,
-          rgba(107,143,163,0.25) 0%,
-          rgba(107,163,140,0.15) 40%,
-          transparent 70%
-        );
-      transform: rotate(-8deg);
-      animation: aurora 8s ease-in-out infinite alternate;
+      content: ''; position: absolute; top: 5%; left: -20%; width: 140%; height: 45%;
+      background: radial-gradient(ellipse 80% 40% at 50% 50%, rgba(107,143,163,.25) 0%, rgba(107,163,140,.15) 40%, transparent 70%);
+      transform: rotate(-8deg); animation: aurora 8s ease-in-out infinite alternate;
     }
-    .hero-placeholder::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 38%;
-      background: linear-gradient(180deg,
-        transparent 0%,
-        rgba(44,62,45,0.6) 40%,
-        rgba(30,43,31,0.95) 100%
-      );
-    }
-    /* Mountain silhouettes */
-    .mountains {
-      position: absolute;
-      bottom: 28%; left: 0; right: 0;
-      height: 35%;
-      z-index: 1;
-    }
+    .hero-placeholder::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 38%; background: linear-gradient(180deg, transparent 0%, rgba(44,62,45,.6) 40%, rgba(30,43,31,.95) 100%); }
+    .mountains { position: absolute; bottom: 28%; left: 0; right: 0; height: 35%; z-index: 1; }
     .mountains svg { width: 100%; height: 100%; }
-    /* Treeline */
-    .treeline {
-      position: absolute;
-      bottom: 26%; left: 0; right: 0;
-      height: 18%;
-      z-index: 2;
-    }
-    .treeline svg { width: 100%; height: 100%; }
+    .treeline  { position: absolute; bottom: 26%; left: 0; right: 0; height: 18%; z-index: 2; }
+    .treeline svg  { width: 100%; height: 100%; }
+    @keyframes aurora { 0%{opacity:.6;transform:rotate(-8deg) translateX(-3%)} 100%{opacity:1;transform:rotate(-4deg) translateX(3%)} }
 
-    @keyframes aurora {
-      0%   { opacity: 0.6; transform: rotate(-8deg) translateX(-3%); }
-      100% { opacity: 1;   transform: rotate(-4deg) translateX(3%); }
-    }
+    .shirt-hero { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-54%); width: min(520px,88vw); aspect-ratio: 1/1; z-index: 4; }
+    .shirt-hero-inner { width: 100%; height: 100%; background: linear-gradient(160deg,#4a3c2a,#1e1710); border-radius: 6px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,.75), 0 0 0 1px rgba(196,168,130,.12); overflow: hidden; }
+    .shirt-hero-inner img { width: 100%; height: 100%; object-fit: cover; }
+    .shirt-hero-inner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.35) 100%); z-index: 1; pointer-events: none; }
+    .shirt-placeholder-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: var(--font-s); font-size: clamp(.6rem,1.5vw,.8rem); letter-spacing: .22em; color: rgba(196,168,130,.28); text-align: center; line-height: 2.2; z-index: 2; white-space: pre; }
 
-    /* Shirt placeholder in hero — square Instagram ratio, big */
-    .shirt-hero {
-      position: absolute;
-      /* sit centered, leaving room for text at bottom */
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -54%);
-      /* Square: as wide as possible while staying on screen */
-      width: min(520px, 88vw);
-      aspect-ratio: 1 / 1;
-      z-index: 4;
-    }
-    .shirt-hero-inner {
-      width: 100%;
-      height: 100%;
-      background:
-        radial-gradient(ellipse at 30% 20%, rgba(196,168,130,0.1), transparent 50%),
-        linear-gradient(160deg, #4a3c2a 0%, #332819 50%, #1e1710 100%);
-      border-radius: 6px;
-      position: relative;
-      box-shadow:
-        0 40px 100px rgba(0,0,0,0.75),
-        0 0 0 1px rgba(196,168,130,0.12),
-        inset 0 1px 0 rgba(255,255,255,0.06);
-      overflow: hidden;
-    }
-    /* Subtle inner vignette so a real photo blends nicely */
-    .shirt-hero-inner::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.35) 100%);
-      z-index: 1;
-      pointer-events: none;
-    }
-    .shirt-hero-inner::after {
-      content: 'PLACE YOUR SHIRT\nPHOTO HERE\n1:1 RATIO';
-      white-space: pre;
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: var(--font-stamp);
-      font-size: clamp(0.6rem, 1.5vw, 0.8rem);
-      letter-spacing: 0.22em;
-      color: rgba(196,168,130,0.28);
-      text-align: center;
-      line-height: 2.2;
-      z-index: 2;
-    }
+    .hero-content { position: relative; z-index: 5; text-align: center; padding: 0 1.5rem 5rem; width: 100%; }
+    .hero-season { font-family: var(--font-s); font-size: clamp(.6rem,1.5vw,.75rem); letter-spacing: .35em; text-transform: uppercase; color: var(--birch); margin-bottom: .6rem; opacity: .9; }
+    .hero-title  { font-family: var(--font-d); font-size: clamp(2.8rem,8vw,6rem); font-weight: 900; font-style: italic; line-height: .92; color: var(--snow); text-shadow: 0 4px 30px rgba(0,0,0,.5); }
+    .hero-title .hl { color: var(--birch); font-style: normal; }
 
-    .hero-content {
-      position: relative;
-      z-index: 5;
-      text-align: center;
-      padding: 0 1.5rem 5rem;
-      width: 100%;
-    }
-    .hero-season {
-      font-family: var(--font-stamp);
-      font-size: clamp(0.6rem, 1.5vw, 0.75rem);
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--birch);
-      margin-bottom: 0.6rem;
-      opacity: 0.9;
-    }
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(2.8rem, 8vw, 6rem);
-      font-weight: 900;
-      font-style: italic;
-      line-height: 0.92;
-      color: var(--snow);
-      text-shadow: 0 4px 30px rgba(0,0,0,0.5);
-      margin-bottom: 0.4rem;
-    }
-    .hero-title span {
-      color: var(--birch);
-      font-style: normal;
-    }
-
-    /* Scroll indicator */
-    .scroll-cue {
-      position: absolute;
-      bottom: 2rem; left: 50%;
-      transform: translateX(-50%);
-      z-index: 6;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-      opacity: 0.6;
-      animation: nudge 2.5s ease-in-out infinite;
-    }
-    .scroll-cue span {
-      font-family: var(--font-stamp);
-      font-size: 0.55rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--fog);
-    }
-    .scroll-cue-line {
-      width: 1px;
-      height: 40px;
-      background: linear-gradient(to bottom, var(--birch), transparent);
-    }
-    @keyframes nudge {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50%       { transform: translateX(-50%) translateY(7px); }
-    }
+    .scroll-cue { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; flex-direction: column; align-items: center; gap: .4rem; opacity: .6; animation: nudge 2.5s ease-in-out infinite; }
+    .scroll-cue span { font-family: var(--font-s); font-size: .55rem; letter-spacing: .3em; text-transform: uppercase; color: var(--fog); }
+    .scroll-cue-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--birch), transparent); }
+    @keyframes nudge { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(7px)} }
 
     /* ─── SECTION BASE ────────────────────────────────────────── */
-    section {
-      padding: clamp(4rem, 10vw, 8rem) clamp(1.2rem, 6vw, 5rem);
-    }
+    section { padding: clamp(4rem,10vw,8rem) clamp(1.2rem,6vw,5rem); }
+    .section-label { font-family: var(--font-s); font-size: .65rem; letter-spacing: .4em; text-transform: uppercase; color: var(--bark); margin-bottom: .8rem; display: flex; align-items: center; gap: .8rem; }
+    .section-label::after { content: ''; flex: 0 0 40px; height: 1px; background: var(--bark); opacity: .5; }
+    .reveal { opacity: 0; transform: translateY(36px); transition: opacity .85s var(--ease), transform .85s var(--ease); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1{transition-delay:.12s} .reveal-delay-2{transition-delay:.24s} .reveal-delay-3{transition-delay:.36s} .reveal-delay-4{transition-delay:.48s}
 
-    /* ─── FADE-IN SCROLL ANIMATIONS ──────────────────────────── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(36px);
-      transition: opacity 0.85s var(--ease-smooth), transform 0.85s var(--ease-smooth);
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .reveal-delay-1 { transition-delay: 0.12s; }
-    .reveal-delay-2 { transition-delay: 0.24s; }
-    .reveal-delay-3 { transition-delay: 0.36s; }
-    .reveal-delay-4 { transition-delay: 0.48s; }
-
-    /* ─── SECTION LABEL ───────────────────────────────────────── */
-    .section-label {
-      font-family: var(--font-stamp);
-      font-size: 0.65rem;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: var(--bark);
-      margin-bottom: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-    .section-label::after {
-      content: '';
-      flex: 0 0 40px;
-      height: 1px;
-      background: var(--bark);
-      opacity: 0.5;
-    }
-
-    /* ─── SECTION 2: DETAILS PREVIEW ─────────────────────────── */
-    #details {
-      background: var(--spruce);
-      position: relative;
-      overflow: hidden;
-    }
-    #details::before {
-      content: '';
-      position: absolute;
-      top: -80px; right: -80px;
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(107,143,163,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .details-header {
-      max-width: 560px;
-      margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
-    }
+    /* ─── SECTION 2: GALLERY ──────────────────────────────────── */
+    #details { background: var(--spruce); position: relative; overflow: hidden; }
+    #details::before { content: ''; position: absolute; top: -80px; right: -80px; width: 400px; height: 400px; background: radial-gradient(circle,rgba(107,143,163,.08),transparent 70%); pointer-events: none; }
+    .details-header { max-width: 560px; margin-bottom: clamp(2.5rem,6vw,4.5rem); }
     .details-header .section-label { color: var(--birch); }
     .details-header .section-label::after { background: var(--birch); }
-    .details-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 5.5vw, 3.5rem);
-      font-weight: 700;
-      line-height: 1.1;
-      color: var(--snow);
-    }
-    .details-title em {
-      color: var(--birch);
-      font-style: italic;
-    }
-    .details-sub {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      line-height: 1.75;
-      color: rgba(232,224,212,0.65);
-      max-width: 440px;
-      font-weight: 300;
-    }
+    .details-title { font-family: var(--font-d); font-size: clamp(2rem,5.5vw,3.5rem); font-weight: 700; line-height: 1.1; color: var(--snow); }
+    .details-title em { color: var(--birch); font-style: italic; }
+    .details-sub { margin-top: 1rem; font-size: .9rem; line-height: 1.75; color: rgba(232,224,212,.65); max-width: 440px; font-weight: 300; }
 
-    /* Mosaic grid */
-    .details-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-template-rows: auto;
-      gap: clamp(0.8rem, 2vw, 1.4rem);
-    }
-    /* Polaroid card */
-    .detail-card {
-      background: #ffffff;
-      border-radius: 3px;
-      overflow: visible;
-      position: relative;
-      padding: 10px 10px 48px 10px; /* thick bottom = polaroid caption strip */
-      box-shadow:
-        0 6px 20px rgba(0,0,0,0.35),
-        0 1px 3px rgba(0,0,0,0.2);
-      transition: transform 0.4s var(--ease-smooth), box-shadow 0.4s;
-    }
-    /* Slight random tilt per card for an authentic scattered-on-table feel */
-    .dc-1 { transform: rotate(-1.2deg); }
-    .dc-2 { transform: rotate(1.8deg); }
-    .dc-3 { transform: rotate(-2.1deg); }
-    .dc-4 { transform: rotate(0.9deg); }
-    .detail-card:hover {
-      transform: rotate(0deg) translateY(-8px) scale(1.02) !important;
-      box-shadow:
-        0 20px 50px rgba(0,0,0,0.45),
-        0 4px 10px rgba(0,0,0,0.2);
-      z-index: 10;
-    }
-    .card-img {
-      width: 100%;
-      position: relative;
-      overflow: hidden;
-    }
-    /* Placeholder gradient inside the photo area */
-    .dc-1 .card-img { background: linear-gradient(120deg, #3B4F3C 0%, #2C3330 60%, #1A2428 100%); }
-    .dc-2 .card-img { background: linear-gradient(200deg, #3d2e1e 0%, #2a1f14 100%); }
-    .dc-3 .card-img { background: linear-gradient(160deg, #2a3525 0%, #1e291a 100%); }
-    .dc-4 .card-img { background: linear-gradient(90deg, #1A2428 0%, #2C3E2D 50%, #3d2e1e 100%); }
-    .card-img::after {
-      content: attr(data-label);
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-stamp);
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: rgba(255,255,255,0.22);
-      text-transform: uppercase;
-    }
-    /* Polaroid caption strip */
-    .card-label {
-      padding: 0.55rem 0.2rem 0;
-      text-align: center;
-    }
-    .card-label p {
-      font-family: var(--font-stamp);
-      font-size: 0.55rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #b0a090;
-      margin-bottom: 0.1rem;
-    }
-    .card-label h3 {
-      font-family: var(--font-stamp);
-      font-size: clamp(0.72rem, 1.2vw, 0.85rem);
-      font-weight: 400;
-      color: #3a3028;
-      letter-spacing: 0.04em;
-    }
-
-    /* Grid column positions & photo aspect ratios */
-    .dc-1 { grid-column: 1 / 8;  }
-    .dc-2 { grid-column: 8 / 13; }
-    .dc-3 { grid-column: 1 / 5;  }
-    .dc-4 { grid-column: 5 / 13; }
-
-    .dc-1 .card-img { aspect-ratio: 4/3; }
-    .dc-2 .card-img { aspect-ratio: 3/4; }
-    .dc-3 .card-img { aspect-ratio: 3/4; }
-    .dc-4 .card-img { aspect-ratio: 16/9; }
+    .details-grid { display: grid; grid-template-columns: repeat(12,1fr); gap: clamp(.8rem,2vw,1.4rem); }
+    .detail-card { background: #fff; border-radius: 3px; overflow: visible; position: relative; padding: 10px 10px 48px; box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.2); transition: transform .4s var(--ease), box-shadow .4s; }
+    .dc-1{transform:rotate(-1.2deg);grid-column:1/8}
+    .dc-2{transform:rotate(1.8deg);grid-column:8/13}
+    .dc-3{transform:rotate(-2.1deg);grid-column:1/5}
+    .dc-4{transform:rotate(.9deg);grid-column:5/13}
+    .detail-card:hover { transform: rotate(0deg) translateY(-8px) scale(1.02) !important; box-shadow: 0 20px 50px rgba(0,0,0,.45), 0 4px 10px rgba(0,0,0,.2); z-index: 10; }
+    .card-img { width: 100%; position: relative; overflow: hidden; }
+    .dc-1 .card-img{aspect-ratio:4/3;background:linear-gradient(120deg,#3B4F3C,#1A2428)}
+    .dc-2 .card-img{aspect-ratio:3/4;background:linear-gradient(200deg,#3d2e1e,#2a1f14)}
+    .dc-3 .card-img{aspect-ratio:3/4;background:linear-gradient(160deg,#2a3525,#1e291a)}
+    .dc-4 .card-img{aspect-ratio:16/9;background:linear-gradient(90deg,#1A2428,#2C3E2D,#3d2e1e)}
+    .card-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .card-img-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-s); font-size: .6rem; letter-spacing: .2em; color: rgba(255,255,255,.22); text-transform: uppercase; }
+    .card-label { padding: .55rem .2rem 0; text-align: center; }
+    .card-label p  { font-family: var(--font-s); font-size: .55rem; letter-spacing: .18em; text-transform: uppercase; color: #b0a090; margin-bottom: .1rem; }
+    .card-label h3 { font-family: var(--font-s); font-size: clamp(.72rem,1.2vw,.85rem); color: #3a3028; letter-spacing: .04em; }
 
     /* ─── SECTION 3: SPECS ────────────────────────────────────── */
-    #specs {
-      background: var(--cream);
-    }
-    .specs-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(2rem, 6vw, 6rem);
-      align-items: start;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    .specs-title {
-      font-family: var(--font-display);
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 700;
-      line-height: 1.15;
-      color: var(--spruce);
-      margin-bottom: 2rem;
-    }
-    .specs-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-    .specs-list li {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 0.85rem 0;
-      border-bottom: 1px solid rgba(44,62,45,0.1);
-      gap: 1rem;
-    }
-    .spec-key {
-      font-family: var(--font-stamp);
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--bark);
-    }
-    .spec-val {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--spruce);
-      text-align: right;
-    }
+    #specs { background: var(--cream); }
+    .specs-inner { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem,6vw,6rem); align-items: start; max-width: 900px; margin: 0 auto; }
+    .specs-title  { font-family: var(--font-d); font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 700; line-height: 1.15; color: var(--spruce); margin-bottom: 2rem; }
+    .sizing-title { font-family: var(--font-d); font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 700; color: var(--spruce); margin-bottom: 2rem; }
+    .specs-list { list-style: none; }
+    .specs-list li { display: flex; justify-content: space-between; align-items: baseline; padding: .85rem 0; border-bottom: 1px solid rgba(44,62,45,.1); gap: 1rem; }
+    .spec-key { font-family: var(--font-s); font-size: .65rem; letter-spacing: .2em; text-transform: uppercase; color: var(--bark); }
+    .spec-val { font-size: .82rem; font-weight: 600; color: var(--spruce); text-align: right; }
+    .size-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    .size-table thead tr  { background: var(--spruce); }
+    .size-table thead th  { font-family: var(--font-s); font-size: .58rem; letter-spacing: .2em; text-transform: uppercase; color: var(--birch); padding: .65rem .75rem; text-align: center; font-weight: 400; }
+    .size-table tbody tr  { border-bottom: 1px solid rgba(44,62,45,.1); transition: background .2s; }
+    .size-table tbody tr:hover { background: rgba(44,62,45,.05); }
+    .size-table tbody td  { padding: .65rem .75rem; text-align: center; color: var(--dusk); }
+    .size-table tbody td:first-child { font-family: var(--font-s); font-weight: 600; color: var(--bark); letter-spacing: .1em; }
+    .size-note { margin-top: .8rem; font-size: .68rem; color: var(--bark); font-style: italic; opacity: .75; }
 
-    /* Sizing chart */
-    .sizing-title {
-      font-family: var(--font-display);
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 700;
-      color: var(--spruce);
-      margin-bottom: 2rem;
-    }
-    .size-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.78rem;
-    }
-    .size-table thead tr {
-      background: var(--spruce);
-    }
-    .size-table thead th {
-      font-family: var(--font-stamp);
-      font-size: 0.58rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--birch);
-      padding: 0.65rem 0.75rem;
-      text-align: center;
-      font-weight: 400;
-    }
-    .size-table tbody tr {
-      border-bottom: 1px solid rgba(44,62,45,0.1);
-      transition: background 0.2s;
-    }
-    .size-table tbody tr:hover {
-      background: rgba(44,62,45,0.05);
-    }
-    .size-table tbody td {
-      padding: 0.65rem 0.75rem;
-      text-align: center;
-      color: var(--dusk);
-      font-weight: 400;
-    }
-    .size-table tbody td:first-child {
-      font-family: var(--font-stamp);
-      font-weight: 600;
-      color: var(--bark);
-      letter-spacing: 0.1em;
-    }
-    .size-note {
-      margin-top: 0.8rem;
-      font-size: 0.68rem;
-      color: var(--bark);
-      font-style: italic;
-      opacity: 0.75;
-    }
-
-    /* ─── SECTION 4: THE DROP (CTA) ───────────────────────────── */
-    #drop {
-      background: var(--dusk);
-      min-height: 100svh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      padding: 6rem clamp(1.2rem, 6vw, 5rem);
-    }
-    /* Background texture */
-    #drop::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 50% 50%,
-          rgba(107,143,163,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 80% 40% at 20% 80%,
-          rgba(44,62,45,0.4) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 50% at 80% 20%,
-          rgba(139,111,71,0.08) 0%, transparent 60%);
-    }
-    /* Large background text */
-    #drop::after {
-      content: 'SANTAI';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: var(--font-stamp);
-      font-size: clamp(6rem, 25vw, 18rem);
-      letter-spacing: 0.08em;
-      color: rgba(255,255,255,0.018);
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    .drop-eyebrow {
-      font-family: var(--font-stamp);
-      font-size: clamp(0.6rem, 1.5vw, 0.72rem);
-      letter-spacing: 0.45em;
-      text-transform: uppercase;
-      color: var(--birch);
-      margin-bottom: 1.2rem;
-      position: relative;
-      z-index: 1;
-    }
-    .drop-title {
-      font-family: var(--font-display);
-      font-size: clamp(3rem, 10vw, 7.5rem);
-      font-weight: 900;
-      line-height: 0.9;
-      color: var(--snow);
-      margin-bottom: 1.2rem;
-      position: relative;
-      z-index: 1;
-    }
-    .drop-title em {
-      display: block;
-      color: var(--birch);
-      font-style: italic;
-      font-size: 0.6em;
-      font-weight: 400;
-      line-height: 1.4;
-      margin-top: 0.2em;
-    }
-    .drop-body {
-      max-width: 420px;
-      font-size: clamp(0.82rem, 2vw, 0.95rem);
-      font-weight: 300;
-      line-height: 1.8;
-      color: rgba(232,224,212,0.55);
-      margin-bottom: 2.8rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* BUY NOW button */
-    .cta-wrap {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.2rem;
-    }
-    .btn-buy {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 1.1rem 3rem;
-      background: var(--birch);
-      color: var(--dusk);
-      font-family: var(--font-stamp);
-      font-size: clamp(0.8rem, 2vw, 0.95rem);
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      text-decoration: none;
-      border: 2px solid var(--birch);
-      border-radius: 3px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition:
-        transform 0.3s var(--ease-smooth),
-        background 0.3s,
-        color 0.3s,
-        box-shadow 0.3s;
-    }
-    .btn-buy::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--dusk);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.4s var(--ease-smooth);
-      z-index: 0;
-    }
+    /* ─── SECTION 4: DROP ─────────────────────────────────────── */
+    #drop { background: var(--dusk); min-height: 100svh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; overflow: hidden; padding: 6rem clamp(1.2rem,6vw,5rem); }
+    #drop::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 50%,rgba(107,143,163,.07),transparent 70%),radial-gradient(ellipse 80% 40% at 20% 80%,rgba(44,62,45,.4),transparent 60%); }
+    #drop::after  { content: 'SANTAI'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: var(--font-s); font-size: clamp(6rem,25vw,18rem); letter-spacing: .08em; color: rgba(255,255,255,.018); pointer-events: none; white-space: nowrap; }
+    .drop-eyebrow { font-family: var(--font-s); font-size: clamp(.6rem,1.5vw,.72rem); letter-spacing: .45em; text-transform: uppercase; color: var(--birch); margin-bottom: 1.2rem; position: relative; z-index: 1; }
+    .drop-title   { font-family: var(--font-d); font-size: clamp(3rem,10vw,7.5rem); font-weight: 900; line-height: .9; color: var(--snow); margin-bottom: 1.2rem; position: relative; z-index: 1; }
+    .drop-title em{ display: block; color: var(--birch); font-style: italic; font-size: .6em; font-weight: 400; line-height: 1.4; margin-top: .2em; }
+    .drop-body    { max-width: 420px; font-size: clamp(.82rem,2vw,.95rem); font-weight: 300; line-height: 1.8; color: rgba(232,224,212,.55); margin-bottom: 2.8rem; position: relative; z-index: 1; }
+    .cta-wrap     { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+    .btn-buy { display: inline-flex; align-items: center; gap: .75rem; padding: 1.1rem 3rem; background: var(--birch); color: var(--dusk); font-family: var(--font-s); font-size: clamp(.8rem,2vw,.95rem); letter-spacing: .35em; text-transform: uppercase; text-decoration: none; border: 2px solid var(--birch); border-radius: 3px; cursor: pointer; position: relative; overflow: hidden; transition: transform .3s var(--ease), box-shadow .3s; }
+    .btn-buy::before { content: ''; position: absolute; inset: 0; background: var(--dusk); transform: scaleX(0); transform-origin: left; transition: transform .4s var(--ease); z-index: 0; }
     .btn-buy:hover::before { transform: scaleX(1); }
-    .btn-buy:hover {
-      color: var(--birch);
-      transform: scale(1.05) translateY(-2px);
-      box-shadow:
-        0 0 30px rgba(196,168,130,0.35),
-        0 12px 30px rgba(0,0,0,0.4);
-    }
-    .btn-buy span { position: relative; z-index: 1; }
-    .btn-arrow {
-      position: relative;
-      z-index: 1;
-      transition: transform 0.3s var(--ease-smooth);
-    }
+    .btn-buy:hover { color: var(--birch); transform: scale(1.05) translateY(-2px); box-shadow: 0 0 30px rgba(196,168,130,.35), 0 12px 30px rgba(0,0,0,.4); }
+    .btn-buy span  { position: relative; z-index: 1; }
+    .btn-arrow     { position: relative; z-index: 1; transition: transform .3s var(--ease); }
     .btn-buy:hover .btn-arrow { transform: translateX(4px); }
-
-    .drop-stock {
-      font-family: var(--font-stamp);
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--rust);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .stock-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--rust);
-      animation: pulse-dot 1.8s ease-in-out infinite;
-    }
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(0.7); }
-    }
+    .drop-stock    { font-family: var(--font-s); font-size: .6rem; letter-spacing: .3em; text-transform: uppercase; color: var(--rust); display: flex; align-items: center; gap: .4rem; }
+    .stock-dot     { width: 6px; height: 6px; border-radius: 50%; background: var(--rust); animation: pdot 1.8s ease-in-out infinite; }
+    @keyframes pdot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
 
     /* ─── FOOTER ──────────────────────────────────────────────── */
-    footer {
-      background: var(--dusk);
-      border-top: 1px solid rgba(196,168,130,0.1);
-      padding: 2rem clamp(1.2rem, 6vw, 5rem);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .footer-logo {
-      font-family: var(--font-stamp);
-      font-size: 0.9rem;
-      letter-spacing: 0.3em;
-      color: var(--birch);
-      opacity: 0.6;
-    }
-    .footer-copy {
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      color: rgba(232,224,212,0.25);
+    footer { background: var(--dusk); border-top: 1px solid rgba(196,168,130,.1); padding: 2rem clamp(1.2rem,6vw,5rem); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-family: var(--font-s); font-size: .9rem; letter-spacing: .3em; color: var(--birch); opacity: .6; }
+    .footer-copy { font-size: .65rem; letter-spacing: .1em; color: rgba(232,224,212,.25); }
+
+    @media(max-width:700px){
+      .dc-1{grid-column:1/13;transform:rotate(-1deg)}
+      .dc-2{grid-column:1/13;transform:rotate(1.5deg)}
+      .dc-3{grid-column:1/7;transform:rotate(-2deg)}
+      .dc-4{grid-column:7/13;transform:rotate(.8deg)}
+      .dc-3 .card-img,.dc-4 .card-img{aspect-ratio:1/1}
+      .specs-inner{grid-template-columns:1fr;gap:3rem}
     }
 
-    /* ─── MOBILE ──────────────────────────────────────────────── */
-    @media (max-width: 700px) {
-      .dc-1 { grid-column: 1 / 13; transform: rotate(-1deg); }
-      .dc-2 { grid-column: 1 / 13; transform: rotate(1.5deg); }
-      .dc-3 { grid-column: 1 / 7;  transform: rotate(-2deg); }
-      .dc-4 { grid-column: 7 / 13; transform: rotate(0.8deg); }
-      .dc-3 .card-img, .dc-4 .card-img { aspect-ratio: 1/1; }
+    /* ══════════════════════════════════════════════════════
+       CMS PANEL
+    ══════════════════════════════════════════════════════ */
 
-      .specs-inner {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-      }
+    #cms-panel {
+      position: fixed; top: 0; right: 0; bottom: 0; z-index: 9998;
+      width: min(390px, 100vw); background: #0d1210;
+      border-left: 1px solid rgba(196,168,130,.13);
+      display: flex; flex-direction: column;
+      transform: translateX(105%); transition: transform .42s var(--ease);
+      font-family: var(--font-b);
     }
+    #cms-panel.open { transform: translateX(0); }
+
+    .cms-head {
+      padding: 1.1rem 1.4rem; border-bottom: 1px solid rgba(196,168,130,.12);
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .cms-head h2 { font-family: var(--font-s); font-size: .82rem; letter-spacing: .28em; color: var(--birch); }
+    .cms-close { background: none; border: none; color: rgba(232,224,212,.35); font-size: 1.1rem; cursor: pointer; padding: .2rem .3rem; border-radius: 3px; transition: color .2s; }
+    .cms-close:hover { color: var(--birch); }
+
+    .cms-tabs { display: flex; border-bottom: 1px solid rgba(196,168,130,.1); flex-shrink: 0; }
+    .cms-tab  { flex: 1; padding: .75rem .3rem; background: none; border: none; border-bottom: 2px solid transparent; font-family: var(--font-s); font-size: .55rem; letter-spacing: .15em; text-transform: uppercase; color: rgba(232,224,212,.35); cursor: pointer; transition: color .2s, border-color .2s; white-space: nowrap; }
+    .cms-tab.active { color: var(--birch); border-bottom-color: var(--birch); }
+
+    .cms-body { flex: 1; overflow-y: auto; padding: 1.1rem 1.4rem; display: flex; flex-direction: column; gap: 1.1rem; scrollbar-width: thin; scrollbar-color: rgba(196,168,130,.2) transparent; }
+
+    .cms-pane { display: none; flex-direction: column; gap: 1rem; }
+    .cms-pane.active { display: flex; }
+
+    .cms-group { font-family: var(--font-s); font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; color: rgba(196,168,130,.35); padding-bottom: .35rem; border-bottom: 1px solid rgba(196,168,130,.07); margin-top: .3rem; }
+
+    .cms-field { display: flex; flex-direction: column; gap: .35rem; }
+    .cms-field label { font-size: .6rem; letter-spacing: .16em; text-transform: uppercase; color: rgba(196,168,130,.65); font-family: var(--font-s); }
+    .cms-field input[type="text"],
+    .cms-field textarea,
+    .cms-field select {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(196,168,130,.14);
+      border-radius: 4px; color: var(--fog); font-family: var(--font-b); font-size: .8rem;
+      padding: .52rem .7rem; width: 100%; transition: border-color .2s;
+    }
+    .cms-field input[type="text"]:focus,
+    .cms-field textarea:focus { outline: none; border-color: rgba(196,168,130,.45); }
+    .cms-field textarea { resize: vertical; min-height: 68px; line-height: 1.55; }
+
+    .cms-color-row { display: flex; align-items: center; gap: .55rem; }
+    .cms-color-row input[type="color"] { width: 38px; height: 38px; border: 1px solid rgba(196,168,130,.15); border-radius: 4px; cursor: pointer; padding: 2px; background: none; flex-shrink: 0; }
+    .cms-color-row input[type="text"]  { flex: 1; }
+
+    .cms-upload {
+      border: 1.5px dashed rgba(196,168,130,.22); border-radius: 6px;
+      padding: 1.2rem; text-align: center; cursor: pointer;
+      transition: border-color .2s, background .2s; position: relative;
+    }
+    .cms-upload:hover { border-color: rgba(196,168,130,.45); background: rgba(196,168,130,.04); }
+    .cms-upload input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .cms-upload p { font-size: .7rem; color: rgba(232,224,212,.38); line-height: 1.6; pointer-events: none; }
+    .cms-upload p strong { color: var(--birch); }
+    .cms-upload-thumb { width: 100%; border-radius: 4px; margin-top: .6rem; max-height: 110px; object-fit: cover; display: none; }
+    .cms-upload-thumb.show { display: block; }
+
+    .spec-row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+
+    .cms-foot { padding: .9rem 1.4rem; border-top: 1px solid rgba(196,168,130,.1); display: flex; gap: .55rem; flex-shrink: 0; }
+    .cms-btn  { flex: 1; padding: .65rem; font-family: var(--font-s); font-size: .63rem; letter-spacing: .2em; text-transform: uppercase; border-radius: 4px; cursor: pointer; border: none; transition: background .2s, transform .15s; }
+    .cms-btn:active { transform: scale(.97); }
+    .cms-btn-primary   { background: var(--birch); color: var(--dusk); }
+    .cms-btn-primary:hover { background: #d4b892; }
+    .cms-btn-secondary { background: rgba(255,255,255,.06); color: rgba(232,224,212,.55); }
+    .cms-btn-secondary:hover { background: rgba(255,255,255,.1); }
+
+    .cms-toast {
+      position: fixed; bottom: 5.2rem; left: 50%; transform: translateX(-50%) translateY(16px);
+      background: #2C3E2D; color: var(--fog); padding: .55rem 1.4rem;
+      border-radius: 20px; font-size: .72rem; font-family: var(--font-s); letter-spacing: .12em;
+      opacity: 0; transition: opacity .3s, transform .3s; pointer-events: none; z-index: 99999; white-space: nowrap;
+    }
+    .cms-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── FULL-SCREEN LOGIN PAGE ───────────────────────────────── */
+    #cms-login {
+      position: fixed; inset: 0; z-index: 99997;
+      background: #080c09;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    #cms-login.open { display: flex; }
+
+    .login-wrap {
+      width: min(400px, 100%);
+      display: flex; flex-direction: column; align-items: center; gap: 2rem;
+      animation: loginIn .5s var(--ease);
+    }
+    @keyframes loginIn { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+    .login-brand {
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+    }
+    .login-brand-name {
+      font-family: var(--font-s); font-size: clamp(1.8rem,5vw,2.4rem);
+      letter-spacing: .45em; color: var(--birch);
+    }
+    .login-brand-sub {
+      font-family: var(--font-s); font-size: .6rem; letter-spacing: .35em;
+      text-transform: uppercase; color: rgba(196,168,130,.35);
+    }
+
+    .login-divider {
+      width: 40px; height: 1px; background: rgba(196,168,130,.2);
+    }
+
+    .login-card {
+      background: #0d1210; border: 1px solid rgba(196,168,130,.15);
+      border-radius: 10px; padding: 2.2rem 2rem 1.8rem;
+      width: 100%; display: flex; flex-direction: column; gap: 1.2rem;
+      box-shadow: 0 32px 80px rgba(0,0,0,.7);
+    }
+    .login-card h3 {
+      font-family: var(--font-s); font-size: .75rem; letter-spacing: .28em;
+      color: rgba(232,224,212,.5); text-align: center; text-transform: uppercase;
+    }
+    .login-input-wrap { position: relative; }
+    .login-input-icon {
+      position: absolute; left: .9rem; top: 50%; transform: translateY(-50%);
+      font-size: .9rem; opacity: .3; pointer-events: none;
+    }
+    .login-input {
+      width: 100%; background: rgba(255,255,255,.04);
+      border: 1px solid rgba(196,168,130,.15); border-radius: 5px;
+      color: var(--fog); font-family: var(--font-b); font-size: .95rem;
+      padding: .85rem .9rem .85rem 2.4rem;
+      letter-spacing: .12em; transition: border-color .2s, background .2s;
+    }
+    .login-input:focus { outline: none; border-color: rgba(196,168,130,.5); background: rgba(255,255,255,.06); }
+    .login-input.shake { animation: shake .38s ease; border-color: #A0522D !important; }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)} 20%{transform:translateX(-9px)}
+      40%{transform:translateX(9px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+    }
+    .login-error {
+      font-size: .68rem; color: #c0503a; text-align: center;
+      font-family: var(--font-s); letter-spacing: .12em;
+      min-height: 1em; opacity: 0; transition: opacity .2s;
+    }
+    .login-error.show { opacity: 1; }
+    .login-btn {
+      width: 100%; padding: .9rem; background: var(--birch); color: var(--dusk);
+      font-family: var(--font-s); font-size: .72rem; letter-spacing: .3em;
+      text-transform: uppercase; border: none; border-radius: 5px; cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s;
+    }
+    .login-btn:hover  { background: #d4b892; box-shadow: 0 0 24px rgba(196,168,130,.3); }
+    .login-btn:active { transform: scale(.98); }
+    .login-back {
+      font-family: var(--font-s); font-size: .58rem; letter-spacing: .2em;
+      color: rgba(196,168,130,.25); text-decoration: none; text-transform: uppercase;
+      transition: color .2s; margin-top: -.5rem;
+    }
+    .login-back:hover { color: rgba(196,168,130,.6); }
   </style>
 </head>
 <body>
 
-  <!-- ─── NAV ─────────────────────────────────────────────── -->
-  <nav>
-    <div class="logo">SANTAI</div>
-    <div class="nav-tag">Season Drop</div>
-  </nav>
+<!-- ═══════════════ WEBSITE ════════════════════════════════════ -->
 
-  <!-- ─── SECTION 1: HERO ───────────────────────────────────── -->
-  <section id="hero">
-    <div class="hero-media">
-      <div class="hero-placeholder">
-        <!-- Mountain silhouettes -->
-        <div class="mountains">
-          <svg viewBox="0 0 1440 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="0,300 180,60 360,200 520,20 700,180 860,80 1020,220 1200,40 1440,160 1440,300" fill="rgba(26,31,26,0.7)"/>
-            <polygon points="0,300 120,120 280,230 440,70 600,210 780,100 960,240 1100,60 1300,180 1440,90 1440,300" fill="rgba(20,25,20,0.5)"/>
-          </svg>
-        </div>
-        <!-- Treeline -->
-        <div class="treeline">
-          <svg viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <g fill="rgba(15,20,15,0.85)">
-              <!-- Repeated tree shapes -->
-              <polygon points="40,160 55,90 70,160"/>
-              <polygon points="50,160 65,70 80,160"/>
-              <polygon points="80,160 97,95 114,160"/>
-              <polygon points="110,160 125,75 140,160"/>
-              <polygon points="130,160 148,88 166,160"/>
-              <polygon points="165,160 180,65 195,160"/>
-              <polygon points="190,160 208,85 226,160"/>
-              <polygon points="220,160 238,72 256,160"/>
-              <polygon points="255,160 272,90 289,160"/>
-              <polygon points="285,160 304,68 323,160"/>
-              <polygon points="320,160 337,82 354,160"/>
-              <polygon points="350,160 368,75 386,160"/>
-              <polygon points="382,160 400,60 418,160"/>
-              <polygon points="415,160 432,85 449,160"/>
-              <polygon points="445,160 463,70 481,160"/>
-              <polygon points="478,160 496,88 514,160"/>
-              <polygon points="510,160 528,65 546,160"/>
-              <polygon points="544,160 562,80 580,160"/>
-              <polygon points="578,160 596,72 614,160"/>
-              <polygon points="612,160 630,86 648,160"/>
-              <polygon points="645,160 663,68 681,160"/>
-              <polygon points="680,160 698,82 716,160"/>
-              <polygon points="712,160 730,60 748,160"/>
-              <polygon points="745,160 764,88 783,160"/>
-              <polygon points="778,160 797,75 816,160"/>
-              <polygon points="812,160 830,65 848,160"/>
-              <polygon points="845,160 863,80 881,160"/>
-              <polygon points="878,160 896,70 914,160"/>
-              <polygon points="912,160 930,85 948,160"/>
-              <polygon points="946,160 964,68 982,160"/>
-              <polygon points="980,160 998,82 1016,160"/>
-              <polygon points="1014,160 1032,60 1050,160"/>
-              <polygon points="1048,160 1066,90 1084,160"/>
-              <polygon points="1082,160 1100,72 1118,160"/>
-              <polygon points="1116,160 1134,85 1152,160"/>
-              <polygon points="1150,160 1168,65 1186,160"/>
-              <polygon points="1184,160 1202,78 1220,160"/>
-              <polygon points="1218,160 1236,70 1254,160"/>
-              <polygon points="1252,160 1270,88 1288,160"/>
-              <polygon points="1286,160 1304,60 1322,160"/>
-              <polygon points="1320,160 1338,82 1356,160"/>
-              <polygon points="1354,160 1372,72 1390,160"/>
-              <polygon points="1388,160 1406,85 1424,160"/>
-              <polygon points="1410,160 1425,68 1440,160"/>
-            </g>
-          </svg>
-        </div>
-      </div>
-    </div>
+<nav>
+  <div class="logo" id="s-logo">SANTAI</div>
+  <div class="nav-tag" id="s-nav-tag">Season Drop</div>
+</nav>
 
-    <!-- Shirt placeholder -->
-    <div class="shirt-hero">
-      <div class="shirt-hero-inner"></div>
-    </div>
-
-    <!-- Text content at bottom -->
-    <div class="hero-content">
-      <p class="hero-season">Season 01 — Alaska Collection</p>
-      <h1 class="hero-title">The <span>Last</span><br/>Frontier</h1>
-    </div>
-
-    <!-- Scroll cue -->
-    <div class="scroll-cue">
-      <span>Scroll</span>
-      <div class="scroll-cue-line"></div>
-    </div>
-  </section>
-
-  <!-- ─── SECTION 2: DETAIL PREVIEW ────────────────────────── -->
-  <section id="details">
-    <div class="details-header reveal">
-      <p class="section-label">The Craft</p>
-      <h2 class="details-title">Built for the<br/><em>cold & the bold.</em></h2>
-      <p class="details-sub">One shirt. One season. Handcrafted details that reward a closer look — from the embroidered chest badge to the brushed-nickel buttons. Every stitch tells you this one's different.</p>
-    </div>
-
-    <div class="details-grid">
-      <div class="detail-card dc-1 reveal reveal-delay-1">
-        <div class="card-img" data-label="Front View" style="aspect-ratio:4/3;"></div>
-        <div class="card-label">
-          <p>Detail 01</p>
-          <h3>The Chest Badge</h3>
-        </div>
-      </div>
-
-      <div class="detail-card dc-2 reveal reveal-delay-2">
-        <div class="card-img" data-label="Close-up" style="aspect-ratio:3/4;"></div>
-        <div class="card-label">
-          <p>Detail 02</p>
-          <h3>Brushed Hardware</h3>
-        </div>
-      </div>
-
-      <div class="detail-card dc-3 reveal reveal-delay-3">
-        <div class="card-img" data-label="Fabric" style="aspect-ratio:3/4;"></div>
-        <div class="card-label">
-          <p>Detail 03</p>
-          <h3>Woven Fabric</h3>
-        </div>
-      </div>
-
-      <div class="detail-card dc-4 reveal reveal-delay-4">
-        <div class="card-img" data-label="Back View" style="aspect-ratio:16/9;"></div>
-        <div class="card-label">
-          <p>Detail 04</p>
-          <h3>The Full Back</h3>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── SECTION 3: SPECS ──────────────────────────────────── -->
-  <section id="specs">
-    <div class="specs-inner">
-      <div>
-        <div class="reveal">
-          <p class="section-label">What It's Made Of</p>
-          <h2 class="specs-title">The Details &amp; Specs</h2>
-        </div>
-        <ul class="specs-list">
-          <li class="reveal reveal-delay-1">
-            <span class="spec-key">Fabric</span>
-            <span class="spec-val">100% Heavyweight Flannel</span>
-          </li>
-          <li class="reveal reveal-delay-2">
-            <span class="spec-key">Weight</span>
-            <span class="spec-val">280 GSM</span>
-          </li>
-          <li class="reveal reveal-delay-3">
-            <span class="spec-key">Fit</span>
-            <span class="spec-val">Relaxed, Unisex</span>
-          </li>
-          <li class="reveal reveal-delay-4">
-            <span class="spec-key">Origin</span>
-            <span class="spec-val">Made in Indonesia</span>
-          </li>
-          <li class="reveal reveal-delay-1">
-            <span class="spec-key">Wash</span>
-            <span class="spec-val">Cold, Inside-Out</span>
-          </li>
-          <li class="reveal reveal-delay-2">
-            <span class="spec-key">Edition</span>
-            <span class="spec-val">Limited — 200 Pieces</span>
-          </li>
-          <li class="reveal reveal-delay-3">
-            <span class="spec-key">Drop</span>
-            <span class="spec-val">Season 01, 2025</span>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <div class="reveal">
-          <p class="section-label">Find Your Fit</p>
-          <h2 class="sizing-title">Size Chart</h2>
-        </div>
-        <div class="reveal reveal-delay-1">
-          <table class="size-table">
-            <thead>
-              <tr>
-                <th>Size</th>
-                <th>Chest (cm)</th>
-                <th>Length (cm)</th>
-                <th>Sleeve (cm)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>S</td><td>96–100</td><td>70</td><td>60</td></tr>
-              <tr><td>M</td><td>101–106</td><td>73</td><td>62</td></tr>
-              <tr><td>L</td><td>107–112</td><td>76</td><td>64</td></tr>
-              <tr><td>XL</td><td>113–119</td><td>79</td><td>66</td></tr>
-              <tr><td>XXL</td><td>120–127</td><td>82</td><td>68</td></tr>
-            </tbody>
-          </table>
-          <p class="size-note">* Measurements are body measurements. When in doubt, size up.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── SECTION 4: THE DROP ───────────────────────────────── -->
-  <section id="drop">
-    <p class="drop-eyebrow reveal">One Shirt. One Chance.</p>
-    <h2 class="drop-title reveal reveal-delay-1">
-      Now<br/>Dropping.
-      <em>Season 01 — Alaska</em>
-    </h2>
-    <p class="drop-body reveal reveal-delay-2">
-      200 pieces, worldwide. Once they're gone, they're gone forever. No restocks. No second chances. This is what SANTAI is about — clothing that means something because it was earned.
-    </p>
-    <div class="cta-wrap reveal reveal-delay-3">
-      <a href="#" class="btn-buy">
-        <span>Buy Now</span>
-        <svg class="btn-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- SECTION 1: HERO -->
+<section id="hero">
+  <div class="hero-media">
+    <div class="hero-placeholder" id="hero-bg-el">
+      <div class="mountains">
+        <svg viewBox="0 0 1440 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="0,300 180,60 360,200 520,20 700,180 860,80 1020,220 1200,40 1440,160 1440,300" fill="rgba(26,31,26,0.7)"/>
+          <polygon points="0,300 120,120 280,230 440,70 600,210 780,100 960,240 1100,60 1300,180 1440,90 1440,300" fill="rgba(20,25,20,0.5)"/>
         </svg>
-      </a>
-      <div class="drop-stock">
-        <span class="stock-dot"></span>
-        <span>Limited Stock Available</span>
+      </div>
+      <div class="treeline">
+        <svg viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <g fill="rgba(15,20,15,0.85)">
+            <polygon points="40,160 55,90 70,160"/><polygon points="50,160 65,70 80,160"/><polygon points="80,160 97,95 114,160"/>
+            <polygon points="110,160 125,75 140,160"/><polygon points="130,160 148,88 166,160"/><polygon points="165,160 180,65 195,160"/>
+            <polygon points="190,160 208,85 226,160"/><polygon points="220,160 238,72 256,160"/><polygon points="255,160 272,90 289,160"/>
+            <polygon points="285,160 304,68 323,160"/><polygon points="320,160 337,82 354,160"/><polygon points="350,160 368,75 386,160"/>
+            <polygon points="382,160 400,60 418,160"/><polygon points="415,160 432,85 449,160"/><polygon points="445,160 463,70 481,160"/>
+            <polygon points="478,160 496,88 514,160"/><polygon points="510,160 528,65 546,160"/><polygon points="544,160 562,80 580,160"/>
+            <polygon points="578,160 596,72 614,160"/><polygon points="612,160 630,86 648,160"/><polygon points="645,160 663,68 681,160"/>
+            <polygon points="680,160 698,82 716,160"/><polygon points="712,160 730,60 748,160"/><polygon points="745,160 764,88 783,160"/>
+            <polygon points="778,160 797,75 816,160"/><polygon points="812,160 830,65 848,160"/><polygon points="845,160 863,80 881,160"/>
+            <polygon points="878,160 896,70 914,160"/><polygon points="912,160 930,85 948,160"/><polygon points="946,160 964,68 982,160"/>
+            <polygon points="980,160 998,82 1016,160"/><polygon points="1014,160 1032,60 1050,160"/><polygon points="1048,160 1066,90 1084,160"/>
+            <polygon points="1082,160 1100,72 1118,160"/><polygon points="1116,160 1134,85 1152,160"/><polygon points="1150,160 1168,65 1186,160"/>
+            <polygon points="1184,160 1202,78 1220,160"/><polygon points="1218,160 1236,70 1254,160"/><polygon points="1252,160 1270,88 1288,160"/>
+            <polygon points="1286,160 1304,60 1322,160"/><polygon points="1320,160 1338,82 1356,160"/><polygon points="1354,160 1372,72 1390,160"/>
+            <polygon points="1388,160 1406,85 1424,160"/><polygon points="1410,160 1425,68 1440,160"/>
+          </g>
+        </svg>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ─── FOOTER ─────────────────────────────────────────────── -->
-  <footer>
-    <div class="footer-logo">SANTAI</div>
-    <div class="footer-copy">© 2025 SANTAI. All rights reserved.</div>
-  </footer>
+  <div class="shirt-hero">
+    <div class="shirt-hero-inner" id="hero-shirt-inner">
+      <span class="shirt-placeholder-text" id="shirt-ph">PLACE YOUR SHIRT&#10;PHOTO HERE&#10;1:1 RATIO</span>
+    </div>
+  </div>
 
-  <!-- ─── SCROLL REVEAL JS ─────────────────────────────────────── -->
-  <script>
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  <div class="hero-content">
+    <p class="hero-season" id="s-hero-season">Season 01 — Alaska Collection</p>
+    <h1 class="hero-title" id="s-hero-title">The <span class="hl">Last</span><br/>Frontier</h1>
+  </div>
+  <div class="scroll-cue"><span>Scroll</span><div class="scroll-cue-line"></div></div>
+</section>
 
-    reveals.forEach(el => observer.observe(el));
-  </script>
+<!-- SECTION 2: GALLERY -->
+<section id="details">
+  <div class="details-header reveal">
+    <p class="section-label" id="s-det-label">The Craft</p>
+    <h2 class="details-title" id="s-det-title">Built for the<br/><em>cold &amp; the bold.</em></h2>
+    <p class="details-sub" id="s-det-sub">One shirt. One season. Handcrafted details that reward a closer look — from the embroidered chest badge to the brushed-nickel buttons. Every stitch tells you this one's different.</p>
+  </div>
+  <div class="details-grid">
+    <div class="detail-card dc-1 reveal reveal-delay-1">
+      <div class="card-img" id="ci-1"><span class="card-img-ph">Front View</span></div>
+      <div class="card-label"><p id="csub-1">Detail 01</p><h3 id="ctit-1">The Chest Badge</h3></div>
+    </div>
+    <div class="detail-card dc-2 reveal reveal-delay-2">
+      <div class="card-img" id="ci-2"><span class="card-img-ph">Close-up</span></div>
+      <div class="card-label"><p id="csub-2">Detail 02</p><h3 id="ctit-2">Brushed Hardware</h3></div>
+    </div>
+    <div class="detail-card dc-3 reveal reveal-delay-3">
+      <div class="card-img" id="ci-3"><span class="card-img-ph">Fabric</span></div>
+      <div class="card-label"><p id="csub-3">Detail 03</p><h3 id="ctit-3">Woven Fabric</h3></div>
+    </div>
+    <div class="detail-card dc-4 reveal reveal-delay-4">
+      <div class="card-img" id="ci-4"><span class="card-img-ph">Back View</span></div>
+      <div class="card-label"><p id="csub-4">Detail 04</p><h3 id="ctit-4">The Full Back</h3></div>
+    </div>
+  </div>
+</section>
 
+<!-- SECTION 3: SPECS -->
+<section id="specs">
+  <div class="specs-inner">
+    <div>
+      <div class="reveal">
+        <p class="section-label">What It's Made Of</p>
+        <h2 class="specs-title">The Details &amp; Specs</h2>
+      </div>
+      <ul class="specs-list">
+        <li class="reveal reveal-delay-1"><span class="spec-key" id="sk-1">Fabric</span><span class="spec-val" id="sv-1">100% Heavyweight Flannel</span></li>
+        <li class="reveal reveal-delay-2"><span class="spec-key" id="sk-2">Weight</span><span class="spec-val" id="sv-2">280 GSM</span></li>
+        <li class="reveal reveal-delay-3"><span class="spec-key" id="sk-3">Fit</span><span class="spec-val" id="sv-3">Relaxed, Unisex</span></li>
+        <li class="reveal reveal-delay-4"><span class="spec-key" id="sk-4">Origin</span><span class="spec-val" id="sv-4">Made in Indonesia</span></li>
+        <li class="reveal reveal-delay-1"><span class="spec-key" id="sk-5">Wash</span><span class="spec-val" id="sv-5">Cold, Inside-Out</span></li>
+        <li class="reveal reveal-delay-2"><span class="spec-key" id="sk-6">Edition</span><span class="spec-val" id="sv-6">Limited — 200 Pieces</span></li>
+        <li class="reveal reveal-delay-3"><span class="spec-key" id="sk-7">Drop</span><span class="spec-val" id="sv-7">Season 01, 2025</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="reveal">
+        <p class="section-label">Find Your Fit</p>
+        <h2 class="sizing-title">Size Chart</h2>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <table class="size-table">
+          <thead><tr><th>Size</th><th>Chest (cm)</th><th>Length (cm)</th><th>Sleeve (cm)</th></tr></thead>
+          <tbody>
+            <tr><td>S</td><td>96–100</td><td>70</td><td>60</td></tr>
+            <tr><td>M</td><td>101–106</td><td>73</td><td>62</td></tr>
+            <tr><td>L</td><td>107–112</td><td>76</td><td>64</td></tr>
+            <tr><td>XL</td><td>113–119</td><td>79</td><td>66</td></tr>
+            <tr><td>XXL</td><td>120–127</td><td>82</td><td>68</td></tr>
+          </tbody>
+        </table>
+        <p class="size-note" id="s-size-note">* Measurements are body measurements. When in doubt, size up.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: DROP / CTA -->
+<section id="drop">
+  <p class="drop-eyebrow reveal" id="s-drop-eyebrow">One Shirt. One Chance.</p>
+  <h2 class="drop-title reveal reveal-delay-1">
+    <span id="s-drop-main">Now<br/>Dropping.</span>
+    <em id="s-drop-sub">Season 01 — Alaska</em>
+  </h2>
+  <p class="drop-body reveal reveal-delay-2" id="s-drop-body">200 pieces, worldwide. Once they're gone, they're gone forever. No restocks. No second chances. This is what SANTAI is about — clothing that means something because it was earned.</p>
+  <div class="cta-wrap reveal reveal-delay-3">
+    <a href="#" class="btn-buy" id="s-btn">
+      <span id="s-btn-text">Buy Now</span>
+      <svg class="btn-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="drop-stock"><span class="stock-dot"></span><span id="s-stock">Limited Stock Available</span></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo" id="s-footer-logo">SANTAI</div>
+  <div class="footer-copy" id="s-footer-copy">© 2025 SANTAI. All rights reserved.</div>
+</footer>
+
+<!-- ═══════════════ FULL-SCREEN LOGIN PAGE ═════════════════════ -->
+<div id="cms-login">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-brand-name">SANTAI</div>
+      <div class="login-brand-sub">Studio — Admin Access</div>
+    </div>
+    <div class="login-divider"></div>
+    <div class="login-card">
+      <h3>Enter Password</h3>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">🔒</span>
+        <input class="login-input" type="password" id="auth-pw" placeholder="Password" autocomplete="off">
+      </div>
+      <p class="login-error" id="login-error">Incorrect password. Try again.</p>
+      <button class="login-btn" id="auth-ok">Access Studio</button>
+    </div>
+    <a href="#" class="login-back" id="login-back">← Back to site</a>
+  </div>
+</div>
+
+<!-- ═══════════════ CMS PANEL ══════════════════════════════════ -->
+
+<div id="cms-panel">
+  <div class="cms-head">
+    <h2>SANTAI Studio</h2>
+    <button class="cms-close" id="cms-close">✕</button>
+  </div>
+
+  <div class="cms-tabs">
+    <button class="cms-tab active" data-tab="hero">Hero</button>
+    <button class="cms-tab" data-tab="gallery">Gallery</button>
+    <button class="cms-tab" data-tab="specs">Specs</button>
+    <button class="cms-tab" data-tab="cta">CTA</button>
+    <button class="cms-tab" data-tab="colors">Colors</button>
+  </div>
+
+  <div class="cms-body">
+
+    <!-- TAB: HERO -->
+    <div class="cms-pane active" id="pane-hero">
+      <p class="cms-group">Brand</p>
+      <div class="cms-field"><label>Logo / Brand Name</label><input type="text" id="f-logo" value="SANTAI"></div>
+      <div class="cms-field"><label>Nav Tag Line</label><input type="text" id="f-nav-tag" value="Season Drop"></div>
+
+      <p class="cms-group">Hero Text</p>
+      <div class="cms-field"><label>Season Line</label><input type="text" id="f-season" value="Season 01 — Alaska Collection"></div>
+      <div class="cms-field"><label>Main Title &nbsp;(use | for line break)</label><input type="text" id="f-title" value="The|Frontier"></div>
+      <div class="cms-field"><label>Highlighted Word (appears in gold)</label><input type="text" id="f-highlight" value="Last"></div>
+
+      <p class="cms-group">Hero Background Photo</p>
+      <div class="cms-upload" id="bg-drop">
+        <input type="file" id="f-bg-file" accept="image/*">
+        <p><strong>Click to upload</strong> a background image<br>or paste a URL below</p>
+        <img class="cms-upload-thumb" id="bg-thumb" src="" alt="">
+      </div>
+      <div class="cms-field">
+        <label>Image URL (alternative)</label>
+        <input type="text" id="f-bg-url" placeholder="https://your-image-url.jpg">
+      </div>
+
+      <p class="cms-group">Shirt Photo (Square / 1:1)</p>
+      <div class="cms-upload">
+        <input type="file" id="f-shirt-file" accept="image/*">
+        <p><strong>Click to upload</strong> your shirt photo<br>Instagram square ratio works best</p>
+        <img class="cms-upload-thumb" id="shirt-thumb" src="" alt="">
+      </div>
+    </div>
+
+    <!-- TAB: GALLERY -->
+    <div class="cms-pane" id="pane-gallery">
+      <p class="cms-group">Section Header</p>
+      <div class="cms-field"><label>Section Label</label><input type="text" id="f-det-label" value="The Craft"></div>
+      <div class="cms-field"><label>Title (HTML allowed — use &lt;br/&gt; &amp; &lt;em&gt;)</label><textarea id="f-det-title">Built for the&lt;br/&gt;&lt;em&gt;cold &amp; the bold.&lt;/em&gt;</textarea></div>
+      <div class="cms-field"><label>Description</label><textarea id="f-det-sub">One shirt. One season. Handcrafted details that reward a closer look — from the embroidered chest badge to the brushed-nickel buttons. Every stitch tells you this one's different.</textarea></div>
+
+      <p class="cms-group">Polaroid 1</p>
+      <div class="cms-upload"><input type="file" id="f-img-1" accept="image/*"><p><strong>Upload photo</strong> for card 1</p><img class="cms-upload-thumb" id="th-1" src="" alt=""></div>
+      <div class="cms-field"><label>Caption Label</label><input type="text" id="f-csub-1" value="Detail 01"></div>
+      <div class="cms-field"><label>Caption Title</label><input type="text" id="f-ctit-1" value="The Chest Badge"></div>
+
+      <p class="cms-group">Polaroid 2</p>
+      <div class="cms-upload"><input type="file" id="f-img-2" accept="image/*"><p><strong>Upload photo</strong> for card 2</p><img class="cms-upload-thumb" id="th-2" src="" alt=""></div>
+      <div class="cms-field"><label>Caption Label</label><input type="text" id="f-csub-2" value="Detail 02"></div>
+      <div class="cms-field"><label>Caption Title</label><input type="text" id="f-ctit-2" value="Brushed Hardware"></div>
+
+      <p class="cms-group">Polaroid 3</p>
+      <div class="cms-upload"><input type="file" id="f-img-3" accept="image/*"><p><strong>Upload photo</strong> for card 3</p><img class="cms-upload-thumb" id="th-3" src="" alt=""></div>
+      <div class="cms-field"><label>Caption Label</label><input type="text" id="f-csub-3" value="Detail 03"></div>
+      <div class="cms-field"><label>Caption Title</label><input type="text" id="f-ctit-3" value="Woven Fabric"></div>
+
+      <p class="cms-group">Polaroid 4</p>
+      <div class="cms-upload"><input type="file" id="f-img-4" accept="image/*"><p><strong>Upload photo</strong> for card 4</p><img class="cms-upload-thumb" id="th-4" src="" alt=""></div>
+      <div class="cms-field"><label>Caption Label</label><input type="text" id="f-csub-4" value="Detail 04"></div>
+      <div class="cms-field"><label>Caption Title</label><input type="text" id="f-ctit-4" value="The Full Back"></div>
+    </div>
+
+    <!-- TAB: SPECS -->
+    <div class="cms-pane" id="pane-specs">
+      <p class="cms-group">Product Details</p>
+      <div class="spec-row"><div class="cms-field"><label>Label 1</label><input type="text" id="sk1" value="Fabric"></div><div class="cms-field"><label>Value 1</label><input type="text" id="sv1" value="100% Heavyweight Flannel"></div></div>
+      <div class="spec-row"><div class="cms-field"><label>Label 2</label><input type="text" id="sk2" value="Weight"></div><div class="cms-field"><label>Value 2</label><input type="text" id="sv2" value="280 GSM"></div></div>
+      <div class="spec-row"><div class="cms-field"><label>Label 3</label><input type="text" id="sk3" value="Fit"></div><div class="cms-field"><label>Value 3</label><input type="text" id="sv3" value="Relaxed, Unisex"></div></div>
+      <div class="spec-row"><div class="cms-field"><label>Label 4</label><input type="text" id="sk4" value="Origin"></div><div class="cms-field"><label>Value 4</label><input type="text" id="sv4" value="Made in Indonesia"></div></div>
+      <div class="spec-row"><div class="cms-field"><label>Label 5</label><input type="text" id="sk5" value="Wash"></div><div class="cms-field"><label>Value 5</label><input type="text" id="sv5" value="Cold, Inside-Out"></div></div>
+      <div class="spec-row"><div class="cms-field"><label>Label 6</label><input type="text" id="sk6" value="Edition"></div><div class="cms-field"><label>Value 6</label><input type="text" id="sv6" value="Limited — 200 Pieces"></div></div>
+      <div class="spec-row"><div class="cms-field"><label>Label 7</label><input type="text" id="sk7" value="Drop"></div><div class="cms-field"><label>Value 7</label><input type="text" id="sv7" value="Season 01, 2025"></div></div>
+      <div class="cms-field"><label>Size Chart Note</label><input type="text" id="f-size-note" value="* Measurements are body measurements. When in doubt, size up."></div>
+    </div>
+
+    <!-- TAB: CTA -->
+    <div class="cms-pane" id="pane-cta">
+      <p class="cms-group">Drop Section</p>
+      <div class="cms-field"><label>Eyebrow Text</label><input type="text" id="f-eyebrow" value="One Shirt. One Chance."></div>
+      <div class="cms-field"><label>Main Title &nbsp;(use | for line break)</label><input type="text" id="f-drop-title" value="Now|Dropping."></div>
+      <div class="cms-field"><label>Season / Subtitle Line</label><input type="text" id="f-drop-sub" value="Season 01 — Alaska"></div>
+      <div class="cms-field"><label>Body Text</label><textarea id="f-drop-body">200 pieces, worldwide. Once they're gone, they're gone forever. No restocks. No second chances. This is what SANTAI is about — clothing that means something because it was earned.</textarea></div>
+      <p class="cms-group">Buy Button</p>
+      <div class="cms-field"><label>Button Label</label><input type="text" id="f-btn-text" value="Buy Now"></div>
+      <div class="cms-field"><label>Button URL / Link</label><input type="text" id="f-btn-url" value="#"></div>
+      <div class="cms-field"><label>Stock Tag Text</label><input type="text" id="f-stock" value="Limited Stock Available"></div>
+      <p class="cms-group">Footer</p>
+      <div class="cms-field"><label>Footer Brand Name</label><input type="text" id="f-footer-logo" value="SANTAI"></div>
+      <div class="cms-field"><label>Copyright Line</label><input type="text" id="f-footer-copy" value="© 2025 SANTAI. All rights reserved."></div>
+    </div>
+
+    <!-- TAB: COLORS -->
+    <div class="cms-pane" id="pane-colors">
+      <p class="cms-group">Brand Palette</p>
+      <div class="cms-field">
+        <label>Accent Gold (buttons, highlights)</label>
+        <div class="cms-color-row"><input type="color" id="cp-birch" value="#C4A882"><input type="text" id="ct-birch" value="#C4A882"></div>
+      </div>
+      <div class="cms-field">
+        <label>Primary Dark (gallery bg, table)</label>
+        <div class="cms-color-row"><input type="color" id="cp-spruce" value="#2C3E2D"><input type="text" id="ct-spruce" value="#2C3E2D"></div>
+      </div>
+      <div class="cms-field">
+        <label>Page Background (cream)</label>
+        <div class="cms-color-row"><input type="color" id="cp-cream" value="#FAF6EF"><input type="text" id="ct-cream" value="#FAF6EF"></div>
+      </div>
+      <div class="cms-field">
+        <label>Dark Background (CTA section)</label>
+        <div class="cms-color-row"><input type="color" id="cp-dusk" value="#1A1F1A"><input type="text" id="ct-dusk" value="#1A1F1A"></div>
+      </div>
+      <div class="cms-field">
+        <label>Rust / Stock Indicator</label>
+        <div class="cms-color-row"><input type="color" id="cp-rust" value="#A0522D"><input type="text" id="ct-rust" value="#A0522D"></div>
+      </div>
+      <div class="cms-field">
+        <label>Bark / Muted Text</label>
+        <div class="cms-color-row"><input type="color" id="cp-bark" value="#8B6F47"><input type="text" id="ct-bark" value="#8B6F47"></div>
+      </div>
+    </div>
+
+  </div><!-- /cms-body -->
+
+  <div class="cms-foot">
+    <button class="cms-btn cms-btn-primary" id="cms-apply">▶ Apply Changes</button>
+    <button class="cms-btn cms-btn-secondary" id="cms-reset">↺ Reset</button>
+  </div>
+</div>
+
+<div class="cms-toast" id="toast"></div>
+
+<!-- ═══════════════ SCRIPTS ════════════════════════════════════ -->
+<script>
+/* ─── Scroll reveal ─────────────────────────────────────────── */
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: .1, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+/* ─── CMS PASSWORD PROTECTION ───────────────────────────────── */
+// ✏️  CHANGE THIS to your own password:
+const CMS_PASSWORD = 'santai2025';
+
+const loginScreen = document.getElementById('cms-login');
+const authInput   = document.getElementById('auth-pw');
+const loginError  = document.getElementById('login-error');
+const panel       = document.getElementById('cms-panel');
+
+function showLoginScreen() {
+  authInput.value = '';
+  loginError.classList.remove('show');
+  loginScreen.classList.add('open');
+  setTimeout(() => authInput.focus(), 120);
+}
+function hideLoginScreen() {
+  loginScreen.classList.remove('open');
+  authInput.value = '';
+  loginError.classList.remove('show');
+}
+function tryUnlock() {
+  if(authInput.value === CMS_PASSWORD) {
+    hideLoginScreen();
+    panel.classList.add('open');
+    // Clear hash so URL looks clean after login
+    history.replaceState(null, '', window.location.pathname);
+    toast('✓ Welcome back');
+  } else {
+    // Shake + show error
+    authInput.classList.remove('shake');
+    void authInput.offsetWidth;
+    authInput.classList.add('shake');
+    authInput.value = '';
+    loginError.classList.add('show');
+    setTimeout(() => {
+      authInput.classList.remove('shake');
+      loginError.classList.remove('show');
+    }, 2500);
+  }
+}
+
+// ── Hash routing: yoursite.html#editCMS ──────────────────────
+function checkHash() {
+  if(window.location.hash === '#editCMS') {
+    showLoginScreen();
+  } else {
+    hideLoginScreen();
+  }
+}
+window.addEventListener('hashchange', checkHash);
+checkHash(); // run on initial load
+
+// "Back to site" link
+document.getElementById('login-back').addEventListener('click', e => {
+  e.preventDefault();
+  history.replaceState(null, '', window.location.pathname);
+  hideLoginScreen();
+});
+
+// Submit button & keyboard
+document.getElementById('auth-ok').addEventListener('click', tryUnlock);
+document.addEventListener('keydown', e => {
+  if(!loginScreen.classList.contains('open')) return;
+  if(e.key === 'Enter')  tryUnlock();
+  if(e.key === 'Escape') {
+    history.replaceState(null, '', window.location.pathname);
+    hideLoginScreen();
+  }
+});
+
+/* ─── CMS close button ──────────────────────────────────────── */
+document.getElementById('cms-close').addEventListener('click', () => {
+  panel.classList.remove('open');
+});
+
+/* ─── Tab switching ─────────────────────────────────────────── */
+document.querySelectorAll('.cms-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.cms-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.cms-pane').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('pane-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* ─── Image store (base64 data URLs) ───────────────────────── */
+const imgs = { bg: null, shirt: null, c1: null, c2: null, c3: null, c4: null };
+
+function bindUpload(inputId, thumbId, storeKey) {
+  const inp = document.getElementById(inputId);
+  const th  = document.getElementById(thumbId);
+  if(!inp) return;
+  inp.addEventListener('change', () => {
+    const file = inp.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      imgs[storeKey] = ev.target.result;
+      if(th){ th.src = ev.target.result; th.classList.add('show'); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+bindUpload('f-bg-file',   'bg-thumb', 'bg');
+bindUpload('f-shirt-file','shirt-thumb','shirt');
+bindUpload('f-img-1','th-1','c1');
+bindUpload('f-img-2','th-2','c2');
+bindUpload('f-img-3','th-3','c3');
+bindUpload('f-img-4','th-4','c4');
+
+// URL-based background
+document.getElementById('f-bg-url').addEventListener('input', function(){
+  if(this.value.trim()) imgs.bg = 'url(' + this.value.trim() + ')';
+});
+
+/* ─── Color pair sync ───────────────────────────────────────── */
+[['cp-birch','ct-birch'],['cp-spruce','ct-spruce'],['cp-cream','ct-cream'],
+ ['cp-dusk','ct-dusk'],['cp-rust','ct-rust'],['cp-bark','ct-bark']].forEach(([pid,tid]) => {
+  const pc = document.getElementById(pid);
+  const tc = document.getElementById(tid);
+  pc.addEventListener('input', () => { tc.value = pc.value; });
+  tc.addEventListener('input', () => { if(/^#[0-9a-fA-F]{6}$/.test(tc.value)) pc.value = tc.value; });
+});
+
+/* ─── APPLY ─────────────────────────────────────────────────── */
+document.getElementById('cms-apply').addEventListener('click', applyAll);
+
+function val(id) { return document.getElementById(id).value; }
+
+function setCardImage(n, src) {
+  const box = document.getElementById(`ci-${n}`);
+  const ph  = box.querySelector('.card-img-ph');
+  let img   = box.querySelector('img');
+  if(!img) { img = document.createElement('img'); box.appendChild(img); }
+  img.src = src;
+  img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+  if(ph) ph.style.display = 'none';
+}
+
+function applyAll() {
+  /* Brand / nav */
+  document.getElementById('s-logo').textContent    = val('f-logo');
+  document.getElementById('s-nav-tag').textContent = val('f-nav-tag');
+  document.getElementById('s-footer-logo').textContent = val('f-footer-logo');
+  document.getElementById('s-footer-copy').textContent = val('f-footer-copy');
+
+  /* Hero text */
+  document.getElementById('s-hero-season').textContent = val('f-season');
+  const titleRaw = val('f-title');
+  const highlight = val('f-highlight');
+  let titleHTML = titleRaw.split('|').join('<br/>');
+  if(highlight) titleHTML = titleHTML.replace(highlight, `<span class="hl">${highlight}</span>`);
+  document.getElementById('s-hero-title').innerHTML = titleHTML;
+
+  /* Hero background */
+  const bgEl = document.getElementById('hero-bg-el');
+  if(imgs.bg) {
+    if(imgs.bg.startsWith('data:')) {
+      bgEl.style.backgroundImage = `url(${imgs.bg})`;
+    } else {
+      bgEl.style.backgroundImage = imgs.bg.startsWith('url(') ? imgs.bg : `url(${imgs.bg})`;
+    }
+    bgEl.style.backgroundSize     = 'cover';
+    bgEl.style.backgroundPosition = 'center';
+  }
+
+  /* Shirt image */
+  if(imgs.shirt) {
+    const inner = document.getElementById('hero-shirt-inner');
+    const ph    = document.getElementById('shirt-ph');
+    let img = inner.querySelector('img');
+    if(!img) { img = document.createElement('img'); inner.appendChild(img); }
+    img.src = imgs.shirt;
+    img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;';
+    if(ph) ph.style.display = 'none';
+  }
+
+  /* Gallery header */
+  document.getElementById('s-det-label').textContent = val('f-det-label');
+  document.getElementById('s-det-title').innerHTML   = val('f-det-title');
+  document.getElementById('s-det-sub').textContent   = val('f-det-sub');
+
+  /* Polaroid captions & images */
+  [1,2,3,4].forEach(n => {
+    document.getElementById(`csub-${n}`).textContent = val(`f-csub-${n}`);
+    document.getElementById(`ctit-${n}`).textContent = val(`f-ctit-${n}`);
+    const src = imgs[`c${n}`];
+    if(src) setCardImage(n, src);
+  });
+
+  /* Specs */
+  for(let i=1;i<=7;i++){
+    document.getElementById(`sk-${i}`).textContent = val(`sk${i}`);
+    document.getElementById(`sv-${i}`).textContent = val(`sv${i}`);
+  }
+  document.getElementById('s-size-note').textContent = val('f-size-note');
+
+  /* CTA / Drop section */
+  document.getElementById('s-drop-eyebrow').textContent = val('f-eyebrow');
+  document.getElementById('s-drop-main').innerHTML      = val('f-drop-title').split('|').join('<br/>');
+  document.getElementById('s-drop-sub').textContent     = val('f-drop-sub');
+  document.getElementById('s-drop-body').textContent    = val('f-drop-body');
+  document.getElementById('s-btn-text').textContent     = val('f-btn-text');
+  document.getElementById('s-btn').href                 = val('f-btn-url');
+  document.getElementById('s-stock').textContent        = val('f-stock');
+
+  /* Colors */
+  const r = document.documentElement.style;
+  r.setProperty('--birch',  val('ct-birch'));
+  r.setProperty('--spruce', val('ct-spruce'));
+  r.setProperty('--cream',  val('ct-cream'));
+  r.setProperty('--dusk',   val('ct-dusk'));
+  r.setProperty('--rust',   val('ct-rust'));
+  r.setProperty('--bark',   val('ct-bark'));
+
+  toast('✓ All changes applied!');
+}
+
+/* ─── Reset ─────────────────────────────────────────────────── */
+document.getElementById('cms-reset').addEventListener('click', () => {
+  if(confirm('Reset everything back to defaults?')) location.reload();
+});
+
+/* ─── Toast ─────────────────────────────────────────────────── */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+</script>
 </body>
 </html>
