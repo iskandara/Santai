@@ -1,877 +1,628 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SANTAI — Season Drop</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Nunito:wght@300;400;500;600&family=Special+Elite&display=swap" rel="stylesheet" />
-  <style>
-    /* ─── TOKENS ──────────────────────────────────────────────── */
-    :root {
-      --spruce:  #2C3E2D;
-      --birch:   #C4A882;
-      --bark:    #8B6F47;
-      --fog:     #E8E0D4;
-      --snow:    #F5F0E8;
-      --rust:    #A0522D;
-      --dusk:    #1A1F1A;
-      --cream:   #FAF6EF;
-      --hero-bg: linear-gradient(180deg,#1B2A35 0%,#2C4A5A 18%,#3B6070 30%,#4A7B8C 40%,#5C6E50 52%,#3B4F3C 65%,#2C3E2D 80%,#1E2B1F 100%);
-      --ease:    cubic-bezier(0.25,0.46,0.45,0.94);
-      --font-d:  'Playfair Display', Georgia, serif;
-      --font-s:  'Special Elite', monospace;
-      --font-b:  'Nunito', sans-serif;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { background: var(--cream); color: var(--dusk); font-family: var(--font-b); overflow-x: hidden; }
-    img  { display: block; width: 100%; object-fit: cover; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SANTAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Bebas+Neue&family=Courier+Prime&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f5f0;--fg:#0a0a0a;--mid:#888;--border:rgba(0,0,0,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;cursor:none;font-family:'Courier Prime',monospace;background:var(--bg);color:var(--fg)}
 
-    body::before {
-      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9998; opacity: 0.032;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 200px 200px;
-    }
+/* CURSOR */
+#cursor{position:fixed;top:0;left:0;z-index:9999;width:10px;height:10px;background:var(--fg);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .25s,border .2s}
+#cursor.drag{width:44px;height:44px;background:transparent;border:1.5px solid var(--fg)}
+#cursor.press{width:5px;height:5px}
 
-    /* ─── NAV ─────────────────────────────────────────────────── */
-    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 2.5rem; }
-    nav::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(26,31,26,.55), transparent); pointer-events: none; }
-    .logo    { font-family: var(--font-s); font-size: clamp(1.4rem,3vw,1.9rem); letter-spacing: .28em; color: var(--snow); text-shadow: 0 1px 6px rgba(0,0,0,.4); position: relative; z-index: 1; }
-    .nav-tag { font-family: var(--font-b); font-size: .65rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--birch); position: relative; z-index: 1; }
+/* BG LAYERS */
+#site-bg-layer{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center;opacity:0;transition:opacity .7s;pointer-events:none}
+#site-bg-layer.on{opacity:1}
+#hold-bg-layer{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;opacity:0;transition:opacity .35s;pointer-events:none}
+#hold-bg-layer.on{opacity:1}
+#hold-color-layer{position:fixed;inset:0;z-index:1;opacity:0;transition:opacity .35s;pointer-events:none}
+#hold-color-layer.on{opacity:1}
 
-    /* ─── HERO ────────────────────────────────────────────────── */
-    #hero { position: relative; height: 100svh; min-height: 600px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; overflow: hidden; }
-    .hero-media { position: absolute; inset: 0; }
-    .hero-placeholder { width: 100%; height: 100%; background: var(--hero-bg); background-size: cover; background-position: center; position: relative; overflow: hidden; }
-    .hero-placeholder::before {
-      content: ''; position: absolute; top: 5%; left: -20%; width: 140%; height: 45%;
-      background: radial-gradient(ellipse 80% 40% at 50% 50%, rgba(107,143,163,.25) 0%, rgba(107,163,140,.15) 40%, transparent 70%);
-      transform: rotate(-8deg); animation: aurora 8s ease-in-out infinite alternate;
-    }
-    .hero-placeholder::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 38%; background: linear-gradient(180deg, transparent 0%, rgba(44,62,45,.6) 40%, rgba(30,43,31,.95) 100%); }
-    .mountains { position: absolute; bottom: 28%; left: 0; right: 0; height: 35%; z-index: 1; }
-    .mountains svg { width: 100%; height: 100%; }
-    .treeline  { position: absolute; bottom: 26%; left: 0; right: 0; height: 18%; z-index: 2; }
-    .treeline svg  { width: 100%; height: 100%; }
-    @keyframes aurora { 0%{opacity:.6;transform:rotate(-8deg) translateX(-3%)} 100%{opacity:1;transform:rotate(-4deg) translateX(3%)} }
+/* GRAIN */
+.grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.032;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px}
 
-    .shirt-hero { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-54%); width: min(520px,88vw); aspect-ratio: 1/1; z-index: 4; }
-    .shirt-hero-inner { width: 100%; height: 100%; background: linear-gradient(160deg,#4a3c2a,#1e1710); border-radius: 6px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,.75), 0 0 0 1px rgba(196,168,130,.12); overflow: hidden; }
-    .shirt-hero-inner img { width: 100%; height: 100%; object-fit: cover; }
-    .shirt-hero-inner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.35) 100%); z-index: 1; pointer-events: none; }
-    .shirt-placeholder-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: var(--font-s); font-size: clamp(.6rem,1.5vw,.8rem); letter-spacing: .22em; color: rgba(196,168,130,.28); text-align: center; line-height: 2.2; z-index: 2; white-space: pre; }
+/* LINES */
+.line-l,.line-r{position:fixed;top:50%;transform:translateY(-50%);width:1px;height:38vh;background:linear-gradient(to bottom,transparent,var(--border) 40%,var(--border) 60%,transparent);z-index:5;pointer-events:none}
+.line-l{left:40px}.line-r{right:40px}
 
-    .hero-content { position: relative; z-index: 5; text-align: center; padding: 0 1.5rem 5rem; width: 100%; }
-    .hero-season { font-family: var(--font-s); font-size: clamp(.6rem,1.5vw,.75rem); letter-spacing: .35em; text-transform: uppercase; color: var(--birch); margin-bottom: .6rem; opacity: .9; }
-    .hero-title  { font-family: var(--font-d); font-size: clamp(2.8rem,8vw,6rem); font-weight: 900; font-style: italic; line-height: .92; color: var(--snow); text-shadow: 0 4px 30px rgba(0,0,0,.5); }
-    .hero-title .hl { color: var(--birch); font-style: normal; }
+/* HEADER — centered logo */
+header{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:28px 48px;animation:fadeUp .9s .1s both}
+.logo-wrap{display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3vw,34px);letter-spacing:.38em;line-height:1}
+.logo-img{max-height:44px;max-width:180px;object-fit:contain;display:none}
+.logo-img.show{display:block}
 
-    .scroll-cue { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; flex-direction: column; align-items: center; gap: .4rem; opacity: .6; animation: nudge 2.5s ease-in-out infinite; }
-    .scroll-cue span { font-family: var(--font-s); font-size: .55rem; letter-spacing: .3em; text-transform: uppercase; color: var(--fog); }
-    .scroll-cue-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--birch), transparent); }
-    @keyframes nudge { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(7px)} }
+/* FOOTER */
+footer{position:fixed;bottom:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:18px 48px 20px;animation:fadeUp .9s .5s both}
+.avail-wrap{display:flex;align-items:center;gap:8px;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mid)}
+.avail-dot{width:6px;height:6px;border-radius:50%;background:var(--fg);animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.dots{display:flex;gap:8px;align-items:center}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--fg);opacity:.22;transition:opacity .3s,transform .3s;cursor:none}
+.dot.active{opacity:1;transform:scale(1.5)}
 
-    /* ─── SECTION BASE ────────────────────────────────────────── */
-    section { padding: clamp(4rem,10vw,8rem) clamp(1.2rem,6vw,5rem); }
-    .section-label { font-family: var(--font-s); font-size: .65rem; letter-spacing: .4em; text-transform: uppercase; color: var(--bark); margin-bottom: .8rem; display: flex; align-items: center; gap: .8rem; }
-    .section-label::after { content: ''; flex: 0 0 40px; height: 1px; background: var(--bark); opacity: .5; }
-    .reveal { opacity: 0; transform: translateY(36px); transition: opacity .85s var(--ease), transform .85s var(--ease); }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-    .reveal-delay-1{transition-delay:.12s} .reveal-delay-2{transition-delay:.24s} .reveal-delay-3{transition-delay:.36s} .reveal-delay-4{transition-delay:.48s}
+/* STAGE */
+.stage{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;animation:fadeUp 1.1s .3s both}
+.swipe-cont{width:100%;height:100%;position:relative;overflow:hidden;display:flex;align-items:center}
+.track{display:flex;align-items:center;height:100%;will-change:transform}
+.slide{display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
-    /* ─── SECTION 2: GALLERY ──────────────────────────────────── */
-    #details { background: var(--spruce); position: relative; overflow: hidden; }
-    #details::before { content: ''; position: absolute; top: -80px; right: -80px; width: 400px; height: 400px; background: radial-gradient(circle,rgba(107,143,163,.08),transparent 70%); pointer-events: none; }
-    .details-header { max-width: 560px; margin-bottom: clamp(2.5rem,6vw,4.5rem); }
-    .details-header .section-label { color: var(--birch); }
-    .details-header .section-label::after { background: var(--birch); }
-    .details-title { font-family: var(--font-d); font-size: clamp(2rem,5.5vw,3.5rem); font-weight: 700; line-height: 1.1; color: var(--snow); }
-    .details-title em { color: var(--birch); font-style: italic; }
-    .details-sub { margin-top: 1rem; font-size: .9rem; line-height: 1.75; color: rgba(232,224,212,.65); max-width: 440px; font-weight: 300; }
+/* SHIRT */
+.shirt-wrap{position:relative;width:min(50vw,420px);aspect-ratio:3/4;user-select:none}
+.shirt-img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;transition:filter .3s;filter:drop-shadow(0 20px 44px rgba(0,0,0,.13));will-change:transform}
+.shirt-wrap.active .shirt-img{filter:drop-shadow(0 20px 44px rgba(0,0,0,.13)) brightness(.78)}
+.ring{position:absolute;inset:-28px;border-radius:50%;border:1px dashed rgba(0,0,0,.13);pointer-events:none;opacity:0;transition:opacity .3s}
+.shirt-wrap:hover .ring{opacity:1}
+.deg-el{position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:.2em;color:var(--mid);text-transform:uppercase;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
+.shirt-wrap.dragging .deg-el{opacity:1}
 
-    .details-grid { display: grid; grid-template-columns: repeat(12,1fr); gap: clamp(.8rem,2vw,1.4rem); }
-    .detail-card { background: #fff; border-radius: 3px; overflow: visible; position: relative; padding: 10px 10px 48px; box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.2); transition: transform .4s var(--ease), box-shadow .4s; }
-    .dc-1{transform:rotate(-1.2deg);grid-column:1/8}
-    .dc-2{transform:rotate(1.8deg);grid-column:8/13}
-    .dc-3{transform:rotate(-2.1deg);grid-column:1/5}
-    .dc-4{transform:rotate(.9deg);grid-column:5/13}
-    .detail-card:hover { transform: rotate(0deg) translateY(-8px) scale(1.02) !important; box-shadow: 0 20px 50px rgba(0,0,0,.45), 0 4px 10px rgba(0,0,0,.2); z-index: 10; }
-    .card-img { width: 100%; position: relative; overflow: hidden; }
-    .dc-1 .card-img{aspect-ratio:4/3;background:linear-gradient(120deg,#3B4F3C,#1A2428)}
-    .dc-2 .card-img{aspect-ratio:3/4;background:linear-gradient(200deg,#3d2e1e,#2a1f14)}
-    .dc-3 .card-img{aspect-ratio:3/4;background:linear-gradient(160deg,#2a3525,#1e291a)}
-    .dc-4 .card-img{aspect-ratio:16/9;background:linear-gradient(90deg,#1A2428,#2C3E2D,#3d2e1e)}
-    .card-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .card-img-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-s); font-size: .6rem; letter-spacing: .2em; color: rgba(255,255,255,.22); text-transform: uppercase; }
-    .card-label { padding: .55rem .2rem 0; text-align: center; }
-    .card-label p  { font-family: var(--font-s); font-size: .55rem; letter-spacing: .18em; text-transform: uppercase; color: #b0a090; margin-bottom: .1rem; }
-    .card-label h3 { font-family: var(--font-s); font-size: clamp(.72rem,1.2vw,.85rem); color: #3a3028; letter-spacing: .04em; }
+/* ARTICLE COUNTER — below shirt */
+.art-counter{
+  position:absolute;
+  bottom:-52px;
+  left:50%;transform:translateX(-50%);
+  font-size:9px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--mid);white-space:nowrap;pointer-events:none;
+  transition:opacity .3s;
+}
+.shirt-wrap.dragging .art-counter{opacity:0}
 
-    /* ─── SECTION 3: SPECS ────────────────────────────────────── */
-    #specs { background: var(--cream); }
-    .specs-inner { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem,6vw,6rem); align-items: start; max-width: 900px; margin: 0 auto; }
-    .specs-title  { font-family: var(--font-d); font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 700; line-height: 1.15; color: var(--spruce); margin-bottom: 2rem; }
-    .sizing-title { font-family: var(--font-d); font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 700; color: var(--spruce); margin-bottom: 2rem; }
-    .specs-list { list-style: none; }
-    .specs-list li { display: flex; justify-content: space-between; align-items: baseline; padding: .85rem 0; border-bottom: 1px solid rgba(44,62,45,.1); gap: 1rem; }
-    .spec-key { font-family: var(--font-s); font-size: .65rem; letter-spacing: .2em; text-transform: uppercase; color: var(--bark); }
-    .spec-val { font-size: .82rem; font-weight: 600; color: var(--spruce); text-align: right; }
-    .size-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
-    .size-table thead tr  { background: var(--spruce); }
-    .size-table thead th  { font-family: var(--font-s); font-size: .58rem; letter-spacing: .2em; text-transform: uppercase; color: var(--birch); padding: .65rem .75rem; text-align: center; font-weight: 400; }
-    .size-table tbody tr  { border-bottom: 1px solid rgba(44,62,45,.1); transition: background .2s; }
-    .size-table tbody tr:hover { background: rgba(44,62,45,.05); }
-    .size-table tbody td  { padding: .65rem .75rem; text-align: center; color: var(--dusk); }
-    .size-table tbody td:first-child { font-family: var(--font-s); font-weight: 600; color: var(--bark); letter-spacing: .1em; }
-    .size-note { margin-top: .8rem; font-size: .68rem; color: var(--bark); font-style: italic; opacity: .75; }
+/* DETAIL PANEL */
+.detail-panel{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:26px;background:linear-gradient(to top,rgba(10,10,10,.83) 0%,rgba(10,10,10,0) 65%);opacity:0;pointer-events:none;transition:opacity .25s}
+.shirt-wrap.active .detail-panel{opacity:1}
+.p-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.25em;color:#f5f5f0;line-height:1;margin-bottom:4px}
+.p-sub{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,245,240,.5);margin-bottom:14px}
+.p-desc{font-family:'Cormorant Garamond',serif;font-size:13px;line-height:1.65;color:rgba(245,245,240,.85);margin-bottom:16px}
+.sz{width:100%;border-collapse:collapse;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,245,240,.7)}
+.sz th{border-bottom:1px solid rgba(245,245,240,.18);padding:5px 0;text-align:left;font-weight:normal;color:rgba(245,245,240,.38)}
+.sz td{padding:5px 0;border-bottom:1px solid rgba(245,245,240,.07)}
+.sz tr:last-child td{border-bottom:none}
 
-    /* ─── SECTION 4: DROP ─────────────────────────────────────── */
-    #drop { background: var(--dusk); min-height: 100svh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; overflow: hidden; padding: 6rem clamp(1.2rem,6vw,5rem); }
-    #drop::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 50%,rgba(107,143,163,.07),transparent 70%),radial-gradient(ellipse 80% 40% at 20% 80%,rgba(44,62,45,.4),transparent 60%); }
-    #drop::after  { content: 'SANTAI'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: var(--font-s); font-size: clamp(6rem,25vw,18rem); letter-spacing: .08em; color: rgba(255,255,255,.018); pointer-events: none; white-space: nowrap; }
-    .drop-eyebrow { font-family: var(--font-s); font-size: clamp(.6rem,1.5vw,.72rem); letter-spacing: .45em; text-transform: uppercase; color: var(--birch); margin-bottom: 1.2rem; position: relative; z-index: 1; }
-    .drop-title   { font-family: var(--font-d); font-size: clamp(3rem,10vw,7.5rem); font-weight: 900; line-height: .9; color: var(--snow); margin-bottom: 1.2rem; position: relative; z-index: 1; }
-    .drop-title em{ display: block; color: var(--birch); font-style: italic; font-size: .6em; font-weight: 400; line-height: 1.4; margin-top: .2em; }
-    .drop-body    { max-width: 420px; font-size: clamp(.82rem,2vw,.95rem); font-weight: 300; line-height: 1.8; color: rgba(232,224,212,.55); margin-bottom: 2.8rem; position: relative; z-index: 1; }
-    .cta-wrap     { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
-    .btn-buy { display: inline-flex; align-items: center; gap: .75rem; padding: 1.1rem 3rem; background: var(--birch); color: var(--dusk); font-family: var(--font-s); font-size: clamp(.8rem,2vw,.95rem); letter-spacing: .35em; text-transform: uppercase; text-decoration: none; border: 2px solid var(--birch); border-radius: 3px; cursor: pointer; position: relative; overflow: hidden; transition: transform .3s var(--ease), box-shadow .3s; }
-    .btn-buy::before { content: ''; position: absolute; inset: 0; background: var(--dusk); transform: scaleX(0); transform-origin: left; transition: transform .4s var(--ease); z-index: 0; }
-    .btn-buy:hover::before { transform: scaleX(1); }
-    .btn-buy:hover { color: var(--birch); transform: scale(1.05) translateY(-2px); box-shadow: 0 0 30px rgba(196,168,130,.35), 0 12px 30px rgba(0,0,0,.4); }
-    .btn-buy span  { position: relative; z-index: 1; }
-    .btn-arrow     { position: relative; z-index: 1; transition: transform .3s var(--ease); }
-    .btn-buy:hover .btn-arrow { transform: translateX(4px); }
-    .drop-stock    { font-family: var(--font-s); font-size: .6rem; letter-spacing: .3em; text-transform: uppercase; color: var(--rust); display: flex; align-items: center; gap: .4rem; }
-    .stock-dot     { width: 6px; height: 6px; border-radius: 50%; background: var(--rust); animation: pdot 1.8s ease-in-out infinite; }
-    @keyframes pdot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+/* TICKER */
+.ticker-wrap{position:fixed;bottom:48px;left:0;right:0;z-index:150;overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px 0;pointer-events:none}
+.ticker-track{display:flex;gap:72px;animation:ticker 20s linear infinite;width:max-content}
+.ticker-item{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--mid);white-space:nowrap}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-    /* ─── FOOTER ──────────────────────────────────────────────── */
-    footer { background: var(--dusk); border-top: 1px solid rgba(196,168,130,.1); padding: 2rem clamp(1.2rem,6vw,5rem); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-    .footer-logo { font-family: var(--font-s); font-size: .9rem; letter-spacing: .3em; color: var(--birch); opacity: .6; }
-    .footer-copy { font-size: .65rem; letter-spacing: .1em; color: rgba(232,224,212,.25); }
+/* ══════════════════════════════
+   PASSWORD GATE
+══════════════════════════════ */
+#pw-gate{
+  position:fixed;inset:0;z-index:1000;
+  background:#0a0a0a;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:0;
+}
+#pw-gate.open{display:flex}
+.pw-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.4em;color:#f5f5f0;margin-bottom:8px}
+.pw-sub{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#444;margin-bottom:48px}
+.pw-field{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);
+  color:#f5f5f0;padding:12px 18px;font-family:'Courier Prime',monospace;
+  font-size:14px;outline:none;width:260px;text-align:center;letter-spacing:.15em;
+  transition:border-color .2s;
+}
+.pw-field:focus{border-color:rgba(255,255,255,.5)}
+.pw-btn{
+  margin-top:14px;width:260px;padding:13px;
+  background:#f5f5f0;color:#0a0a0a;border:none;
+  font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.3em;
+  cursor:pointer;transition:opacity .2s;
+}
+.pw-btn:hover{opacity:.8}
+.pw-err{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#c0392b;margin-top:12px;opacity:0;transition:opacity .3s}
+.pw-err.show{opacity:1}
 
-    @media(max-width:700px){
-      .dc-1{grid-column:1/13;transform:rotate(-1deg)}
-      .dc-2{grid-column:1/13;transform:rotate(1.5deg)}
-      .dc-3{grid-column:1/7;transform:rotate(-2deg)}
-      .dc-4{grid-column:7/13;transform:rotate(.8deg)}
-      .dc-3 .card-img,.dc-4 .card-img{aspect-ratio:1/1}
-      .specs-inner{grid-template-columns:1fr;gap:3rem}
-    }
-
-    /* ══════════════════════════════════════════════════════
-       CMS PANEL
-    ══════════════════════════════════════════════════════ */
-
-    #cms-panel {
-      position: fixed; top: 0; right: 0; bottom: 0; z-index: 9998;
-      width: min(390px, 100vw); background: #0d1210;
-      border-left: 1px solid rgba(196,168,130,.13);
-      display: flex; flex-direction: column;
-      transform: translateX(105%); transition: transform .42s var(--ease);
-      font-family: var(--font-b);
-    }
-    #cms-panel.open { transform: translateX(0); }
-
-    .cms-head {
-      padding: 1.1rem 1.4rem; border-bottom: 1px solid rgba(196,168,130,.12);
-      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
-    }
-    .cms-head h2 { font-family: var(--font-s); font-size: .82rem; letter-spacing: .28em; color: var(--birch); }
-    .cms-close { background: none; border: none; color: rgba(232,224,212,.35); font-size: 1.1rem; cursor: pointer; padding: .2rem .3rem; border-radius: 3px; transition: color .2s; }
-    .cms-close:hover { color: var(--birch); }
-
-    .cms-tabs { display: flex; border-bottom: 1px solid rgba(196,168,130,.1); flex-shrink: 0; }
-    .cms-tab  { flex: 1; padding: .75rem .3rem; background: none; border: none; border-bottom: 2px solid transparent; font-family: var(--font-s); font-size: .55rem; letter-spacing: .15em; text-transform: uppercase; color: rgba(232,224,212,.35); cursor: pointer; transition: color .2s, border-color .2s; white-space: nowrap; }
-    .cms-tab.active { color: var(--birch); border-bottom-color: var(--birch); }
-
-    .cms-body { flex: 1; overflow-y: auto; padding: 1.1rem 1.4rem; display: flex; flex-direction: column; gap: 1.1rem; scrollbar-width: thin; scrollbar-color: rgba(196,168,130,.2) transparent; }
-
-    .cms-pane { display: none; flex-direction: column; gap: 1rem; }
-    .cms-pane.active { display: flex; }
-
-    .cms-group { font-family: var(--font-s); font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; color: rgba(196,168,130,.35); padding-bottom: .35rem; border-bottom: 1px solid rgba(196,168,130,.07); margin-top: .3rem; }
-
-    .cms-field { display: flex; flex-direction: column; gap: .35rem; }
-    .cms-field label { font-size: .6rem; letter-spacing: .16em; text-transform: uppercase; color: rgba(196,168,130,.65); font-family: var(--font-s); }
-    .cms-field input[type="text"],
-    .cms-field textarea,
-    .cms-field select {
-      background: rgba(255,255,255,.05); border: 1px solid rgba(196,168,130,.14);
-      border-radius: 4px; color: var(--fog); font-family: var(--font-b); font-size: .8rem;
-      padding: .52rem .7rem; width: 100%; transition: border-color .2s;
-    }
-    .cms-field input[type="text"]:focus,
-    .cms-field textarea:focus { outline: none; border-color: rgba(196,168,130,.45); }
-    .cms-field textarea { resize: vertical; min-height: 68px; line-height: 1.55; }
-
-    .cms-color-row { display: flex; align-items: center; gap: .55rem; }
-    .cms-color-row input[type="color"] { width: 38px; height: 38px; border: 1px solid rgba(196,168,130,.15); border-radius: 4px; cursor: pointer; padding: 2px; background: none; flex-shrink: 0; }
-    .cms-color-row input[type="text"]  { flex: 1; }
-
-    .cms-upload {
-      border: 1.5px dashed rgba(196,168,130,.22); border-radius: 6px;
-      padding: 1.2rem; text-align: center; cursor: pointer;
-      transition: border-color .2s, background .2s; position: relative;
-    }
-    .cms-upload:hover { border-color: rgba(196,168,130,.45); background: rgba(196,168,130,.04); }
-    .cms-upload input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-    .cms-upload p { font-size: .7rem; color: rgba(232,224,212,.38); line-height: 1.6; pointer-events: none; }
-    .cms-upload p strong { color: var(--birch); }
-    .cms-upload-thumb { width: 100%; border-radius: 4px; margin-top: .6rem; max-height: 110px; object-fit: cover; display: none; }
-    .cms-upload-thumb.show { display: block; }
-
-    .spec-row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
-
-    .cms-foot { padding: .9rem 1.4rem; border-top: 1px solid rgba(196,168,130,.1); display: flex; gap: .55rem; flex-shrink: 0; }
-    .cms-btn  { flex: 1; padding: .65rem; font-family: var(--font-s); font-size: .63rem; letter-spacing: .2em; text-transform: uppercase; border-radius: 4px; cursor: pointer; border: none; transition: background .2s, transform .15s; }
-    .cms-btn:active { transform: scale(.97); }
-    .cms-btn-primary   { background: var(--birch); color: var(--dusk); }
-    .cms-btn-primary:hover { background: #d4b892; }
-    .cms-btn-secondary { background: rgba(255,255,255,.06); color: rgba(232,224,212,.55); }
-    .cms-btn-secondary:hover { background: rgba(255,255,255,.1); }
-
-    .cms-toast {
-      position: fixed; bottom: 5.2rem; left: 50%; transform: translateX(-50%) translateY(16px);
-      background: #2C3E2D; color: var(--fog); padding: .55rem 1.4rem;
-      border-radius: 20px; font-size: .72rem; font-family: var(--font-s); letter-spacing: .12em;
-      opacity: 0; transition: opacity .3s, transform .3s; pointer-events: none; z-index: 99999; white-space: nowrap;
-    }
-    .cms-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ── FULL-SCREEN LOGIN PAGE ───────────────────────────────── */
-    #cms-login {
-      position: fixed; inset: 0; z-index: 99997;
-      background: #080c09;
-      display: none; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 2rem;
-    }
-    #cms-login.open { display: flex; }
-
-    .login-wrap {
-      width: min(400px, 100%);
-      display: flex; flex-direction: column; align-items: center; gap: 2rem;
-      animation: loginIn .5s var(--ease);
-    }
-    @keyframes loginIn { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-
-    .login-brand {
-      display: flex; flex-direction: column; align-items: center; gap: .5rem;
-    }
-    .login-brand-name {
-      font-family: var(--font-s); font-size: clamp(1.8rem,5vw,2.4rem);
-      letter-spacing: .45em; color: var(--birch);
-    }
-    .login-brand-sub {
-      font-family: var(--font-s); font-size: .6rem; letter-spacing: .35em;
-      text-transform: uppercase; color: rgba(196,168,130,.35);
-    }
-
-    .login-divider {
-      width: 40px; height: 1px; background: rgba(196,168,130,.2);
-    }
-
-    .login-card {
-      background: #0d1210; border: 1px solid rgba(196,168,130,.15);
-      border-radius: 10px; padding: 2.2rem 2rem 1.8rem;
-      width: 100%; display: flex; flex-direction: column; gap: 1.2rem;
-      box-shadow: 0 32px 80px rgba(0,0,0,.7);
-    }
-    .login-card h3 {
-      font-family: var(--font-s); font-size: .75rem; letter-spacing: .28em;
-      color: rgba(232,224,212,.5); text-align: center; text-transform: uppercase;
-    }
-    .login-input-wrap { position: relative; }
-    .login-input-icon {
-      position: absolute; left: .9rem; top: 50%; transform: translateY(-50%);
-      font-size: .9rem; opacity: .3; pointer-events: none;
-    }
-    .login-input {
-      width: 100%; background: rgba(255,255,255,.04);
-      border: 1px solid rgba(196,168,130,.15); border-radius: 5px;
-      color: var(--fog); font-family: var(--font-b); font-size: .95rem;
-      padding: .85rem .9rem .85rem 2.4rem;
-      letter-spacing: .12em; transition: border-color .2s, background .2s;
-    }
-    .login-input:focus { outline: none; border-color: rgba(196,168,130,.5); background: rgba(255,255,255,.06); }
-    .login-input.shake { animation: shake .38s ease; border-color: #A0522D !important; }
-    @keyframes shake {
-      0%,100%{transform:translateX(0)} 20%{transform:translateX(-9px)}
-      40%{transform:translateX(9px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
-    }
-    .login-error {
-      font-size: .68rem; color: #c0503a; text-align: center;
-      font-family: var(--font-s); letter-spacing: .12em;
-      min-height: 1em; opacity: 0; transition: opacity .2s;
-    }
-    .login-error.show { opacity: 1; }
-    .login-btn {
-      width: 100%; padding: .9rem; background: var(--birch); color: var(--dusk);
-      font-family: var(--font-s); font-size: .72rem; letter-spacing: .3em;
-      text-transform: uppercase; border: none; border-radius: 5px; cursor: pointer;
-      transition: background .2s, transform .15s, box-shadow .2s;
-    }
-    .login-btn:hover  { background: #d4b892; box-shadow: 0 0 24px rgba(196,168,130,.3); }
-    .login-btn:active { transform: scale(.98); }
-    .login-back {
-      font-family: var(--font-s); font-size: .58rem; letter-spacing: .2em;
-      color: rgba(196,168,130,.25); text-decoration: none; text-transform: uppercase;
-      transition: color .2s; margin-top: -.5rem;
-    }
-    .login-back:hover { color: rgba(196,168,130,.6); }
-  </style>
+/* ══════════════════════════════
+   CMS PANEL
+══════════════════════════════ */
+#cms-overlay{position:fixed;inset:0;z-index:600;display:none;align-items:stretch}
+#cms-overlay.open{display:flex}
+#cms-backdrop{flex:1;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);cursor:none}
+#cms-panel{width:min(440px,96vw);background:#0a0a0a;color:#f5f5f0;overflow-y:auto;padding:40px 36px 60px;animation:slideIn .35s ease}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.cms-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px}
+.cms-ttl{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.3em}
+.cms-x{background:none;border:none;color:#f5f5f0;font-size:20px;cursor:pointer;opacity:.5;transition:opacity .2s;font-family:'Courier Prime',monospace}
+.cms-x:hover{opacity:1}
+.cms-sec{margin-bottom:30px}
+.cms-sec-lbl{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#888;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:8px}
+.cms-fld{margin-bottom:14px}
+.cms-fld label{display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#888;margin-bottom:5px}
+.cms-fld input[type=text],.cms-fld textarea,.cms-fld input[type=password]{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#f5f5f0;padding:9px 11px;font-family:'Courier Prime',monospace;font-size:12px;outline:none;resize:vertical;transition:border-color .2s}
+.cms-fld input:focus,.cms-fld textarea:focus{border-color:rgba(255,255,255,.4)}
+.up-btn{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px dashed rgba(255,255,255,.2);color:#f5f5f0;padding:11px 16px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;width:100%;justify-content:center;transition:background .2s,border-color .2s}
+.up-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.4)}
+.up-btn input{display:none}
+.prev-thumb{width:100%;height:110px;object-fit:cover;margin-top:8px;border:1px solid rgba(255,255,255,.08);display:none}
+.prev-thumb.show{display:block}
+.art-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.art-tab{font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:5px 12px;border:1px solid rgba(255,255,255,.15);background:none;color:#888;cursor:pointer;transition:all .2s}
+.art-tab.active{background:#f5f5f0;color:#0a0a0a;border-color:#f5f5f0}
+.add-art-btn{width:100%;padding:9px;background:none;color:#888;border:1px dashed rgba(255,255,255,.15);font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-bottom:16px}
+.add-art-btn:hover{color:#f5f5f0;border-color:rgba(255,255,255,.4)}
+.save-btn{width:100%;padding:13px;background:#f5f5f0;color:#0a0a0a;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.3em;cursor:pointer;transition:opacity .2s;margin-top:6px}
+.save-btn:hover{opacity:.8}
+.del-art-btn{width:100%;padding:10px;background:none;color:#c0392b;border:1px solid rgba(192,57,43,.3);font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:8px}
+.del-art-btn:hover{background:rgba(192,57,43,.12);border-color:#c0392b}
+.save-confirm{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#2ecc71;text-align:center;margin-top:10px;opacity:0;transition:opacity .4s}
+.save-confirm.show{opacity:1}
+/* change-pw row */
+.pw-row{display:flex;gap:8px;align-items:flex-end}
+.pw-row .cms-fld{flex:1;margin-bottom:0}
+.pw-change-btn{padding:9px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#f5f5f0;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.pw-change-btn:hover{background:rgba(255,255,255,.15)}
+</style>
 </head>
 <body>
 
-<!-- ═══════════════ WEBSITE ════════════════════════════════════ -->
+<div id="cursor"></div>
+<div id="site-bg-layer"></div>
+<div id="hold-bg-layer"></div>
+<div id="hold-color-layer"></div>
+<div class="grain"></div>
+<div class="line-l"></div>
+<div class="line-r"></div>
 
-<nav>
-  <div class="logo" id="s-logo">SANTAI</div>
-  <div class="nav-tag" id="s-nav-tag">Season Drop</div>
-</nav>
-
-<!-- SECTION 1: HERO -->
-<section id="hero">
-  <div class="hero-media">
-    <div class="hero-placeholder" id="hero-bg-el">
-      <div class="mountains">
-        <svg viewBox="0 0 1440 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="0,300 180,60 360,200 520,20 700,180 860,80 1020,220 1200,40 1440,160 1440,300" fill="rgba(26,31,26,0.7)"/>
-          <polygon points="0,300 120,120 280,230 440,70 600,210 780,100 960,240 1100,60 1300,180 1440,90 1440,300" fill="rgba(20,25,20,0.5)"/>
-        </svg>
-      </div>
-      <div class="treeline">
-        <svg viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <g fill="rgba(15,20,15,0.85)">
-            <polygon points="40,160 55,90 70,160"/><polygon points="50,160 65,70 80,160"/><polygon points="80,160 97,95 114,160"/>
-            <polygon points="110,160 125,75 140,160"/><polygon points="130,160 148,88 166,160"/><polygon points="165,160 180,65 195,160"/>
-            <polygon points="190,160 208,85 226,160"/><polygon points="220,160 238,72 256,160"/><polygon points="255,160 272,90 289,160"/>
-            <polygon points="285,160 304,68 323,160"/><polygon points="320,160 337,82 354,160"/><polygon points="350,160 368,75 386,160"/>
-            <polygon points="382,160 400,60 418,160"/><polygon points="415,160 432,85 449,160"/><polygon points="445,160 463,70 481,160"/>
-            <polygon points="478,160 496,88 514,160"/><polygon points="510,160 528,65 546,160"/><polygon points="544,160 562,80 580,160"/>
-            <polygon points="578,160 596,72 614,160"/><polygon points="612,160 630,86 648,160"/><polygon points="645,160 663,68 681,160"/>
-            <polygon points="680,160 698,82 716,160"/><polygon points="712,160 730,60 748,160"/><polygon points="745,160 764,88 783,160"/>
-            <polygon points="778,160 797,75 816,160"/><polygon points="812,160 830,65 848,160"/><polygon points="845,160 863,80 881,160"/>
-            <polygon points="878,160 896,70 914,160"/><polygon points="912,160 930,85 948,160"/><polygon points="946,160 964,68 982,160"/>
-            <polygon points="980,160 998,82 1016,160"/><polygon points="1014,160 1032,60 1050,160"/><polygon points="1048,160 1066,90 1084,160"/>
-            <polygon points="1082,160 1100,72 1118,160"/><polygon points="1116,160 1134,85 1152,160"/><polygon points="1150,160 1168,65 1186,160"/>
-            <polygon points="1184,160 1202,78 1220,160"/><polygon points="1218,160 1236,70 1254,160"/><polygon points="1252,160 1270,88 1288,160"/>
-            <polygon points="1286,160 1304,60 1322,160"/><polygon points="1320,160 1338,82 1356,160"/><polygon points="1354,160 1372,72 1390,160"/>
-            <polygon points="1388,160 1406,85 1424,160"/><polygon points="1410,160 1425,68 1440,160"/>
-          </g>
-        </svg>
-      </div>
-    </div>
+<!-- HEADER — centered logo -->
+<header>
+  <div class="logo-wrap">
+    <img class="logo-img" id="logoImg" src="" alt="SANTAI"/>
+    <div class="logo-text" id="logoText">SANTAI</div>
   </div>
+</header>
 
-  <div class="shirt-hero">
-    <div class="shirt-hero-inner" id="hero-shirt-inner">
-      <span class="shirt-placeholder-text" id="shirt-ph">PLACE YOUR SHIRT&#10;PHOTO HERE&#10;1:1 RATIO</span>
-    </div>
+<!-- STAGE -->
+<div class="stage">
+  <div class="swipe-cont" id="swipeCont">
+    <div class="track" id="track"></div>
   </div>
+</div>
 
-  <div class="hero-content">
-    <p class="hero-season" id="s-hero-season">Season 01 — Alaska Collection</p>
-    <h1 class="hero-title" id="s-hero-title">The <span class="hl">Last</span><br/>Frontier</h1>
-  </div>
-  <div class="scroll-cue"><span>Scroll</span><div class="scroll-cue-line"></div></div>
-</section>
+<!-- TICKER -->
+<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack"></div></div>
 
-<!-- SECTION 2: GALLERY -->
-<section id="details">
-  <div class="details-header reveal">
-    <p class="section-label" id="s-det-label">The Craft</p>
-    <h2 class="details-title" id="s-det-title">Built for the<br/><em>cold &amp; the bold.</em></h2>
-    <p class="details-sub" id="s-det-sub">One shirt. One season. Handcrafted details that reward a closer look — from the embroidered chest badge to the brushed-nickel buttons. Every stitch tells you this one's different.</p>
-  </div>
-  <div class="details-grid">
-    <div class="detail-card dc-1 reveal reveal-delay-1">
-      <div class="card-img" id="ci-1"><span class="card-img-ph">Front View</span></div>
-      <div class="card-label"><p id="csub-1">Detail 01</p><h3 id="ctit-1">The Chest Badge</h3></div>
-    </div>
-    <div class="detail-card dc-2 reveal reveal-delay-2">
-      <div class="card-img" id="ci-2"><span class="card-img-ph">Close-up</span></div>
-      <div class="card-label"><p id="csub-2">Detail 02</p><h3 id="ctit-2">Brushed Hardware</h3></div>
-    </div>
-    <div class="detail-card dc-3 reveal reveal-delay-3">
-      <div class="card-img" id="ci-3"><span class="card-img-ph">Fabric</span></div>
-      <div class="card-label"><p id="csub-3">Detail 03</p><h3 id="ctit-3">Woven Fabric</h3></div>
-    </div>
-    <div class="detail-card dc-4 reveal reveal-delay-4">
-      <div class="card-img" id="ci-4"><span class="card-img-ph">Back View</span></div>
-      <div class="card-label"><p id="csub-4">Detail 04</p><h3 id="ctit-4">The Full Back</h3></div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 3: SPECS -->
-<section id="specs">
-  <div class="specs-inner">
-    <div>
-      <div class="reveal">
-        <p class="section-label">What It's Made Of</p>
-        <h2 class="specs-title">The Details &amp; Specs</h2>
-      </div>
-      <ul class="specs-list">
-        <li class="reveal reveal-delay-1"><span class="spec-key" id="sk-1">Fabric</span><span class="spec-val" id="sv-1">100% Heavyweight Flannel</span></li>
-        <li class="reveal reveal-delay-2"><span class="spec-key" id="sk-2">Weight</span><span class="spec-val" id="sv-2">280 GSM</span></li>
-        <li class="reveal reveal-delay-3"><span class="spec-key" id="sk-3">Fit</span><span class="spec-val" id="sv-3">Relaxed, Unisex</span></li>
-        <li class="reveal reveal-delay-4"><span class="spec-key" id="sk-4">Origin</span><span class="spec-val" id="sv-4">Made in Indonesia</span></li>
-        <li class="reveal reveal-delay-1"><span class="spec-key" id="sk-5">Wash</span><span class="spec-val" id="sv-5">Cold, Inside-Out</span></li>
-        <li class="reveal reveal-delay-2"><span class="spec-key" id="sk-6">Edition</span><span class="spec-val" id="sv-6">Limited — 200 Pieces</span></li>
-        <li class="reveal reveal-delay-3"><span class="spec-key" id="sk-7">Drop</span><span class="spec-val" id="sv-7">Season 01, 2025</span></li>
-      </ul>
-    </div>
-    <div>
-      <div class="reveal">
-        <p class="section-label">Find Your Fit</p>
-        <h2 class="sizing-title">Size Chart</h2>
-      </div>
-      <div class="reveal reveal-delay-1">
-        <table class="size-table">
-          <thead><tr><th>Size</th><th>Chest (cm)</th><th>Length (cm)</th><th>Sleeve (cm)</th></tr></thead>
-          <tbody>
-            <tr><td>S</td><td>96–100</td><td>70</td><td>60</td></tr>
-            <tr><td>M</td><td>101–106</td><td>73</td><td>62</td></tr>
-            <tr><td>L</td><td>107–112</td><td>76</td><td>64</td></tr>
-            <tr><td>XL</td><td>113–119</td><td>79</td><td>66</td></tr>
-            <tr><td>XXL</td><td>120–127</td><td>82</td><td>68</td></tr>
-          </tbody>
-        </table>
-        <p class="size-note" id="s-size-note">* Measurements are body measurements. When in doubt, size up.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 4: DROP / CTA -->
-<section id="drop">
-  <p class="drop-eyebrow reveal" id="s-drop-eyebrow">One Shirt. One Chance.</p>
-  <h2 class="drop-title reveal reveal-delay-1">
-    <span id="s-drop-main">Now<br/>Dropping.</span>
-    <em id="s-drop-sub">Season 01 — Alaska</em>
-  </h2>
-  <p class="drop-body reveal reveal-delay-2" id="s-drop-body">200 pieces, worldwide. Once they're gone, they're gone forever. No restocks. No second chances. This is what SANTAI is about — clothing that means something because it was earned.</p>
-  <div class="cta-wrap reveal reveal-delay-3">
-    <a href="#" class="btn-buy" id="s-btn">
-      <span id="s-btn-text">Buy Now</span>
-      <svg class="btn-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
-    <div class="drop-stock"><span class="stock-dot"></span><span id="s-stock">Limited Stock Available</span></div>
-  </div>
-</section>
-
+<!-- FOOTER -->
 <footer>
-  <div class="footer-logo" id="s-footer-logo">SANTAI</div>
-  <div class="footer-copy" id="s-footer-copy">© 2025 SANTAI. All rights reserved.</div>
+  <div class="avail-wrap"><div class="avail-dot"></div><span id="availTxt">Available Now</span></div>
+  <div class="dots" id="dotsEl"></div>
 </footer>
 
-<!-- ═══════════════ FULL-SCREEN LOGIN PAGE ═════════════════════ -->
-<div id="cms-login">
-  <div class="login-wrap">
-    <div class="login-brand">
-      <div class="login-brand-name">SANTAI</div>
-      <div class="login-brand-sub">Studio — Admin Access</div>
+<!-- PASSWORD GATE -->
+<div id="pw-gate">
+  <div class="pw-logo">SANTAI</div>
+  <div class="pw-sub">CMS — Editor Access</div>
+  <input class="pw-field" id="pw-input" type="password" placeholder="Enter password" autocomplete="off"/>
+  <button class="pw-btn" id="pw-submit">ENTER</button>
+  <div class="pw-err" id="pw-err">Incorrect password</div>
+</div>
+
+<!-- CMS PANEL -->
+<div id="cms-overlay">
+  <div id="cms-backdrop"></div>
+  <div id="cms-panel">
+    <div class="cms-hdr">
+      <div class="cms-ttl">SANTAI CMS</div>
+      <button class="cms-x" id="cms-x">✕</button>
     </div>
-    <div class="login-divider"></div>
-    <div class="login-card">
-      <h3>Enter Password</h3>
-      <div class="login-input-wrap">
-        <span class="login-input-icon">🔒</span>
-        <input class="login-input" type="password" id="auth-pw" placeholder="Password" autocomplete="off">
+
+    <!-- GLOBAL -->
+    <div class="cms-sec">
+      <div class="cms-sec-lbl">Global Settings</div>
+      <div class="cms-fld">
+        <label>Site Logo (image replaces text)</label>
+        <label class="up-btn">↑ Upload Logo<input type="file" id="f-logo" accept="image/*"></label>
+        <img class="prev-thumb" id="pv-logo"/>
+        <button class="del-art-btn" id="remove-logo-btn" style="margin-top:6px;color:#888;border-color:rgba(255,255,255,.15)">✕ Remove Logo / Use Text</button>
       </div>
-      <p class="login-error" id="login-error">Incorrect password. Try again.</p>
-      <button class="login-btn" id="auth-ok">Access Studio</button>
+      <div class="cms-fld"><label>Available Now Text</label><input type="text" id="g-avail" value="Available Now"/></div>
+      <div class="cms-fld"><label>Running Text (separate items with |)</label><textarea id="g-ticker" rows="3">Santai SS25 — Drop 01|One Shirt. One Season. No Restock.|340gsm Japanese Poplin|Limited to 50 Pieces|Drag to Rotate — Hold to Inspect</textarea></div>
+      <div class="cms-fld">
+        <label>Site Background Image</label>
+        <label class="up-btn">↑ Upload Site Background<input type="file" id="f-site-bg" accept="image/*"></label>
+        <img class="prev-thumb" id="pv-site-bg"/>
+      </div>
     </div>
-    <a href="#" class="login-back" id="login-back">← Back to site</a>
+
+    <!-- CHANGE PASSWORD -->
+    <div class="cms-sec">
+      <div class="cms-sec-lbl">Change CMS Password</div>
+      <div class="pw-row">
+        <div class="cms-fld"><label>New Password</label><input type="password" id="g-new-pw" placeholder="New password"/></div>
+        <button class="pw-change-btn" id="change-pw-btn">Update</button>
+      </div>
+    </div>
+
+    <!-- ARTICLES -->
+    <div class="cms-sec">
+      <div class="cms-sec-lbl">Articles</div>
+      <div class="art-tabs" id="artTabs"></div>
+      <button class="add-art-btn" id="addArtBtn">+ Add Article</button>
+      <div id="artEditor">
+        <div class="cms-fld"><label>Shirt Name</label><input type="text" id="a-name"/></div>
+        <div class="cms-fld"><label>Subtitle</label><input type="text" id="a-sub"/></div>
+        <div class="cms-fld"><label>Description</label><textarea id="a-desc" rows="3"></textarea></div>
+        <div class="cms-fld">
+          <label>Shirt Image</label>
+          <label class="up-btn">↑ Upload Shirt Image<input type="file" id="f-shirt" accept="image/*"></label>
+          <img class="prev-thumb" id="pv-shirt"/>
+        </div>
+        <div class="cms-fld">
+          <label>Hold Background Image</label>
+          <label class="up-btn">↑ Upload Hold Background<input type="file" id="f-hold-bg" accept="image/*"></label>
+          <img class="prev-thumb" id="pv-hold-bg"/>
+        </div>
+        <div class="cms-fld"><label>Hold Background Color (fallback, e.g. #1a1a2e)</label><input type="text" id="a-hold-color" placeholder="#1a1a2e"/></div>
+        <div class="cms-fld"><label>Size Chart (S,chest,length,shoulder — one per line)</label><textarea id="a-sizes" rows="4">S,104,72,48
+M,110,75,51
+L,116,78,54
+XL,122,81,57</textarea></div>
+        <button class="save-btn" id="saveArtBtn">SAVE ALL CHANGES</button>
+        <div class="save-confirm" id="save-confirm">✓ Saved & applied</div>
+        <button class="del-art-btn" id="delArtBtn">✕ Delete This Article</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ═══════════════ CMS PANEL ══════════════════════════════════ -->
-
-<div id="cms-panel">
-  <div class="cms-head">
-    <h2>SANTAI Studio</h2>
-    <button class="cms-close" id="cms-close">✕</button>
-  </div>
-
-  <div class="cms-tabs">
-    <button class="cms-tab active" data-tab="hero">Hero</button>
-    <button class="cms-tab" data-tab="gallery">Gallery</button>
-    <button class="cms-tab" data-tab="specs">Specs</button>
-    <button class="cms-tab" data-tab="cta">CTA</button>
-    <button class="cms-tab" data-tab="colors">Colors</button>
-  </div>
-
-  <div class="cms-body">
-
-    <!-- TAB: HERO -->
-    <div class="cms-pane active" id="pane-hero">
-      <p class="cms-group">Brand</p>
-      <div class="cms-field"><label>Logo / Brand Name</label><input type="text" id="f-logo" value="SANTAI"></div>
-      <div class="cms-field"><label>Nav Tag Line</label><input type="text" id="f-nav-tag" value="Season Drop"></div>
-
-      <p class="cms-group">Hero Text</p>
-      <div class="cms-field"><label>Season Line</label><input type="text" id="f-season" value="Season 01 — Alaska Collection"></div>
-      <div class="cms-field"><label>Main Title &nbsp;(use | for line break)</label><input type="text" id="f-title" value="The|Frontier"></div>
-      <div class="cms-field"><label>Highlighted Word (appears in gold)</label><input type="text" id="f-highlight" value="Last"></div>
-
-      <p class="cms-group">Hero Background Photo</p>
-      <div class="cms-upload" id="bg-drop">
-        <input type="file" id="f-bg-file" accept="image/*">
-        <p><strong>Click to upload</strong> a background image<br>or paste a URL below</p>
-        <img class="cms-upload-thumb" id="bg-thumb" src="" alt="">
-      </div>
-      <div class="cms-field">
-        <label>Image URL (alternative)</label>
-        <input type="text" id="f-bg-url" placeholder="https://your-image-url.jpg">
-      </div>
-
-      <p class="cms-group">Shirt Photo (Square / 1:1)</p>
-      <div class="cms-upload">
-        <input type="file" id="f-shirt-file" accept="image/*">
-        <p><strong>Click to upload</strong> your shirt photo<br>Instagram square ratio works best</p>
-        <img class="cms-upload-thumb" id="shirt-thumb" src="" alt="">
-      </div>
-    </div>
-
-    <!-- TAB: GALLERY -->
-    <div class="cms-pane" id="pane-gallery">
-      <p class="cms-group">Section Header</p>
-      <div class="cms-field"><label>Section Label</label><input type="text" id="f-det-label" value="The Craft"></div>
-      <div class="cms-field"><label>Title (HTML allowed — use &lt;br/&gt; &amp; &lt;em&gt;)</label><textarea id="f-det-title">Built for the&lt;br/&gt;&lt;em&gt;cold &amp; the bold.&lt;/em&gt;</textarea></div>
-      <div class="cms-field"><label>Description</label><textarea id="f-det-sub">One shirt. One season. Handcrafted details that reward a closer look — from the embroidered chest badge to the brushed-nickel buttons. Every stitch tells you this one's different.</textarea></div>
-
-      <p class="cms-group">Polaroid 1</p>
-      <div class="cms-upload"><input type="file" id="f-img-1" accept="image/*"><p><strong>Upload photo</strong> for card 1</p><img class="cms-upload-thumb" id="th-1" src="" alt=""></div>
-      <div class="cms-field"><label>Caption Label</label><input type="text" id="f-csub-1" value="Detail 01"></div>
-      <div class="cms-field"><label>Caption Title</label><input type="text" id="f-ctit-1" value="The Chest Badge"></div>
-
-      <p class="cms-group">Polaroid 2</p>
-      <div class="cms-upload"><input type="file" id="f-img-2" accept="image/*"><p><strong>Upload photo</strong> for card 2</p><img class="cms-upload-thumb" id="th-2" src="" alt=""></div>
-      <div class="cms-field"><label>Caption Label</label><input type="text" id="f-csub-2" value="Detail 02"></div>
-      <div class="cms-field"><label>Caption Title</label><input type="text" id="f-ctit-2" value="Brushed Hardware"></div>
-
-      <p class="cms-group">Polaroid 3</p>
-      <div class="cms-upload"><input type="file" id="f-img-3" accept="image/*"><p><strong>Upload photo</strong> for card 3</p><img class="cms-upload-thumb" id="th-3" src="" alt=""></div>
-      <div class="cms-field"><label>Caption Label</label><input type="text" id="f-csub-3" value="Detail 03"></div>
-      <div class="cms-field"><label>Caption Title</label><input type="text" id="f-ctit-3" value="Woven Fabric"></div>
-
-      <p class="cms-group">Polaroid 4</p>
-      <div class="cms-upload"><input type="file" id="f-img-4" accept="image/*"><p><strong>Upload photo</strong> for card 4</p><img class="cms-upload-thumb" id="th-4" src="" alt=""></div>
-      <div class="cms-field"><label>Caption Label</label><input type="text" id="f-csub-4" value="Detail 04"></div>
-      <div class="cms-field"><label>Caption Title</label><input type="text" id="f-ctit-4" value="The Full Back"></div>
-    </div>
-
-    <!-- TAB: SPECS -->
-    <div class="cms-pane" id="pane-specs">
-      <p class="cms-group">Product Details</p>
-      <div class="spec-row"><div class="cms-field"><label>Label 1</label><input type="text" id="sk1" value="Fabric"></div><div class="cms-field"><label>Value 1</label><input type="text" id="sv1" value="100% Heavyweight Flannel"></div></div>
-      <div class="spec-row"><div class="cms-field"><label>Label 2</label><input type="text" id="sk2" value="Weight"></div><div class="cms-field"><label>Value 2</label><input type="text" id="sv2" value="280 GSM"></div></div>
-      <div class="spec-row"><div class="cms-field"><label>Label 3</label><input type="text" id="sk3" value="Fit"></div><div class="cms-field"><label>Value 3</label><input type="text" id="sv3" value="Relaxed, Unisex"></div></div>
-      <div class="spec-row"><div class="cms-field"><label>Label 4</label><input type="text" id="sk4" value="Origin"></div><div class="cms-field"><label>Value 4</label><input type="text" id="sv4" value="Made in Indonesia"></div></div>
-      <div class="spec-row"><div class="cms-field"><label>Label 5</label><input type="text" id="sk5" value="Wash"></div><div class="cms-field"><label>Value 5</label><input type="text" id="sv5" value="Cold, Inside-Out"></div></div>
-      <div class="spec-row"><div class="cms-field"><label>Label 6</label><input type="text" id="sk6" value="Edition"></div><div class="cms-field"><label>Value 6</label><input type="text" id="sv6" value="Limited — 200 Pieces"></div></div>
-      <div class="spec-row"><div class="cms-field"><label>Label 7</label><input type="text" id="sk7" value="Drop"></div><div class="cms-field"><label>Value 7</label><input type="text" id="sv7" value="Season 01, 2025"></div></div>
-      <div class="cms-field"><label>Size Chart Note</label><input type="text" id="f-size-note" value="* Measurements are body measurements. When in doubt, size up."></div>
-    </div>
-
-    <!-- TAB: CTA -->
-    <div class="cms-pane" id="pane-cta">
-      <p class="cms-group">Drop Section</p>
-      <div class="cms-field"><label>Eyebrow Text</label><input type="text" id="f-eyebrow" value="One Shirt. One Chance."></div>
-      <div class="cms-field"><label>Main Title &nbsp;(use | for line break)</label><input type="text" id="f-drop-title" value="Now|Dropping."></div>
-      <div class="cms-field"><label>Season / Subtitle Line</label><input type="text" id="f-drop-sub" value="Season 01 — Alaska"></div>
-      <div class="cms-field"><label>Body Text</label><textarea id="f-drop-body">200 pieces, worldwide. Once they're gone, they're gone forever. No restocks. No second chances. This is what SANTAI is about — clothing that means something because it was earned.</textarea></div>
-      <p class="cms-group">Buy Button</p>
-      <div class="cms-field"><label>Button Label</label><input type="text" id="f-btn-text" value="Buy Now"></div>
-      <div class="cms-field"><label>Button URL / Link</label><input type="text" id="f-btn-url" value="#"></div>
-      <div class="cms-field"><label>Stock Tag Text</label><input type="text" id="f-stock" value="Limited Stock Available"></div>
-      <p class="cms-group">Footer</p>
-      <div class="cms-field"><label>Footer Brand Name</label><input type="text" id="f-footer-logo" value="SANTAI"></div>
-      <div class="cms-field"><label>Copyright Line</label><input type="text" id="f-footer-copy" value="© 2025 SANTAI. All rights reserved."></div>
-    </div>
-
-    <!-- TAB: COLORS -->
-    <div class="cms-pane" id="pane-colors">
-      <p class="cms-group">Brand Palette</p>
-      <div class="cms-field">
-        <label>Accent Gold (buttons, highlights)</label>
-        <div class="cms-color-row"><input type="color" id="cp-birch" value="#C4A882"><input type="text" id="ct-birch" value="#C4A882"></div>
-      </div>
-      <div class="cms-field">
-        <label>Primary Dark (gallery bg, table)</label>
-        <div class="cms-color-row"><input type="color" id="cp-spruce" value="#2C3E2D"><input type="text" id="ct-spruce" value="#2C3E2D"></div>
-      </div>
-      <div class="cms-field">
-        <label>Page Background (cream)</label>
-        <div class="cms-color-row"><input type="color" id="cp-cream" value="#FAF6EF"><input type="text" id="ct-cream" value="#FAF6EF"></div>
-      </div>
-      <div class="cms-field">
-        <label>Dark Background (CTA section)</label>
-        <div class="cms-color-row"><input type="color" id="cp-dusk" value="#1A1F1A"><input type="text" id="ct-dusk" value="#1A1F1A"></div>
-      </div>
-      <div class="cms-field">
-        <label>Rust / Stock Indicator</label>
-        <div class="cms-color-row"><input type="color" id="cp-rust" value="#A0522D"><input type="text" id="ct-rust" value="#A0522D"></div>
-      </div>
-      <div class="cms-field">
-        <label>Bark / Muted Text</label>
-        <div class="cms-color-row"><input type="color" id="cp-bark" value="#8B6F47"><input type="text" id="ct-bark" value="#8B6F47"></div>
-      </div>
-    </div>
-
-  </div><!-- /cms-body -->
-
-  <div class="cms-foot">
-    <button class="cms-btn cms-btn-primary" id="cms-apply">▶ Apply Changes</button>
-    <button class="cms-btn cms-btn-secondary" id="cms-reset">↺ Reset</button>
-  </div>
-</div>
-
-<div class="cms-toast" id="toast"></div>
-
-<!-- ═══════════════ SCRIPTS ════════════════════════════════════ -->
 <script>
-/* ─── Scroll reveal ─────────────────────────────────────────── */
-const revObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: .1, rootMargin: '0px 0px -30px 0px' });
-document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+/* ══════════════════════════════════
+   PERSISTENCE — localStorage
+══════════════════════════════════ */
+const LS_KEY = 'santai_store_v2';
+const PW_KEY  = 'santai_cms_pw';
 
-/* ─── CMS PASSWORD PROTECTION ───────────────────────────────── */
-// ✏️  CHANGE THIS to your own password:
-const CMS_PASSWORD = 'santai2025';
+const DEFAULT_STORE = {
+  availText:'Available Now',
+  ticker:'Santai SS25 — Drop 01|One Shirt. One Season. No Restock.|340gsm Japanese Poplin|Limited to 50 Pieces|Drag to Rotate — Hold to Inspect',
+  siteBg:null,
+  logoImg:null,
+  articles:[{
+    id:1,name:'The Void Shirt',sub:'SS25 — Drop 01 — Ltd. 50 pcs',
+    desc:'Heavyweight 340gsm poplin. Tonal embroidery at chest. Garment-washed for a lived-in drape. Oversized silhouette with dropped shoulders.',
+    shirtImg:null,holdBg:null,holdColor:'#1a1a2e',
+    sizes:[{s:'S',c:'104',l:'72',sh:'48'},{s:'M',c:'110',l:'75',sh:'51'},{s:'L',c:'116',l:'78',sh:'54'},{s:'XL',c:'122',l:'81',sh:'57'}]
+  }]
+};
 
-const loginScreen = document.getElementById('cms-login');
-const authInput   = document.getElementById('auth-pw');
-const loginError  = document.getElementById('login-error');
-const panel       = document.getElementById('cms-panel');
-
-function showLoginScreen() {
-  authInput.value = '';
-  loginError.classList.remove('show');
-  loginScreen.classList.add('open');
-  setTimeout(() => authInput.focus(), 120);
+function loadStore(){
+  try{ const s=localStorage.getItem(LS_KEY); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_STORE)); }
+  catch(e){ return JSON.parse(JSON.stringify(DEFAULT_STORE)); }
 }
-function hideLoginScreen() {
-  loginScreen.classList.remove('open');
-  authInput.value = '';
-  loginError.classList.remove('show');
-}
-function tryUnlock() {
-  if(authInput.value === CMS_PASSWORD) {
-    hideLoginScreen();
-    panel.classList.add('open');
-    // Clear hash so URL looks clean after login
-    history.replaceState(null, '', window.location.pathname);
-    toast('✓ Welcome back');
+function saveStore(){ try{ localStorage.setItem(LS_KEY,JSON.stringify(store)); }catch(e){} }
+function getPassword(){ return localStorage.getItem(PW_KEY)||'santai2025'; }
+function setPassword(pw){ localStorage.setItem(PW_KEY,pw); }
+
+let store = loadStore();
+let curIdx = 0, cmsIdx = 0;
+
+/* ══════════════════════════════════
+   CURSOR
+══════════════════════════════════ */
+const cur=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{ cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
+
+/* ══════════════════════════════════
+   CMS ROUTE — #CMSedit
+══════════════════════════════════ */
+function checkRoute(){
+  if(window.location.hash==='#CMSedit'){
+    document.getElementById('pw-gate').classList.add('open');
   } else {
-    // Shake + show error
-    authInput.classList.remove('shake');
-    void authInput.offsetWidth;
-    authInput.classList.add('shake');
-    authInput.value = '';
-    loginError.classList.add('show');
-    setTimeout(() => {
-      authInput.classList.remove('shake');
-      loginError.classList.remove('show');
-    }, 2500);
+    document.getElementById('pw-gate').classList.remove('open');
   }
 }
+window.addEventListener('hashchange', checkRoute);
+checkRoute();
 
-// ── Hash routing: yoursite.html#editCMS ──────────────────────
-function checkHash() {
-  if(window.location.hash === '#editCMS') {
-    showLoginScreen();
+document.getElementById('pw-submit').addEventListener('click', tryLogin);
+document.getElementById('pw-input').addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });
+
+function tryLogin(){
+  const val = document.getElementById('pw-input').value;
+  if(val === getPassword()){
+    document.getElementById('pw-gate').classList.remove('open');
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-err').classList.remove('show');
+    openCMS();
   } else {
-    hideLoginScreen();
+    document.getElementById('pw-err').classList.add('show');
+    document.getElementById('pw-input').value='';
+    setTimeout(()=>document.getElementById('pw-err').classList.remove('show'),2400);
   }
 }
-window.addEventListener('hashchange', checkHash);
-checkHash(); // run on initial load
 
-// "Back to site" link
-document.getElementById('login-back').addEventListener('click', e => {
-  e.preventDefault();
-  history.replaceState(null, '', window.location.pathname);
-  hideLoginScreen();
-});
+/* ══════════════════════════════════
+   LAYERS
+══════════════════════════════════ */
+const siteBgLayer   = document.getElementById('site-bg-layer');
+const holdBgLayer   = document.getElementById('hold-bg-layer');
+const holdColorLayer= document.getElementById('hold-color-layer');
 
-// Submit button & keyboard
-document.getElementById('auth-ok').addEventListener('click', tryUnlock);
-document.addEventListener('keydown', e => {
-  if(!loginScreen.classList.contains('open')) return;
-  if(e.key === 'Enter')  tryUnlock();
-  if(e.key === 'Escape') {
-    history.replaceState(null, '', window.location.pathname);
-    hideLoginScreen();
-  }
-});
+function showHoldBg(art){
+  if(art.holdBg){ holdBgLayer.style.backgroundImage=`url(${art.holdBg})`; holdBgLayer.classList.add('on'); holdColorLayer.classList.remove('on'); }
+  else if(art.holdColor){ holdColorLayer.style.background=art.holdColor; holdColorLayer.classList.add('on'); holdBgLayer.classList.remove('on'); }
+}
+function hideHoldBg(){ holdBgLayer.classList.remove('on'); holdColorLayer.classList.remove('on'); }
 
-/* ─── CMS close button ──────────────────────────────────────── */
-document.getElementById('cms-close').addEventListener('click', () => {
-  panel.classList.remove('open');
-});
+/* ══════════════════════════════════
+   SVG FALLBACK SHIRT
+══════════════════════════════════ */
+function svgShirt(){
+  return `<svg class="shirt-img" viewBox="0 0 340 420" xmlns="http://www.w3.org/2000/svg">
+    <defs><filter id="shf"><feDropShadow dx="0" dy="8" stdDeviation="14" flood-opacity=".1"/></filter></defs>
+    <path d="M90 90 L60 160 L30 155 L50 240 L90 235 L90 380 L250 380 L250 235 L290 240 L310 155 L280 160 L250 90 L220 70 Q170 50 120 70 Z" fill="#f5f5f0" stroke="#0a0a0a" stroke-width="2.5" stroke-linejoin="round" filter="url(#shf)"/>
+    <path d="M140 70 Q170 95 200 70" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round"/>
+    <path d="M90 90 L60 160" fill="none" stroke="#0a0a0a" stroke-width="1" stroke-dasharray="4 3" opacity=".3"/>
+    <path d="M250 90 L280 160" fill="none" stroke="#0a0a0a" stroke-width="1" stroke-dasharray="4 3" opacity=".3"/>
+    <rect x="114" y="148" width="36" height="28" rx="1" fill="none" stroke="#0a0a0a" stroke-width="1.2" opacity=".5"/>
+    <line x1="170" y1="100" x2="170" y2="380" stroke="#0a0a0a" stroke-width=".6" stroke-dasharray="3 5" opacity=".18"/>
+    <text x="170" y="310" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" letter-spacing="8" fill="#0a0a0a" opacity=".07">SANTAI</text>
+  </svg>`;
+}
 
-/* ─── Tab switching ─────────────────────────────────────────── */
-document.querySelectorAll('.cms-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.cms-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.cms-pane').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('pane-' + tab.dataset.tab).classList.add('active');
+function szTable(sizes){
+  if(!sizes||!sizes.length) return '';
+  return `<table class="sz"><thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Shoulder</th></tr></thead><tbody>${sizes.map(r=>`<tr><td>${r.s}</td><td>${r.c} cm</td><td>${r.l} cm</td><td>${r.sh} cm</td></tr>`).join('')}</tbody></table>`;
+}
+
+/* ══════════════════════════════════
+   RENDER TRACK
+══════════════════════════════════ */
+const trackEl=document.getElementById('track');
+
+function renderTrack(){
+  trackEl.innerHTML='';
+  const W=window.innerWidth, total=store.articles.length;
+  store.articles.forEach((art,i)=>{
+    const slide=document.createElement('div');
+    slide.className='slide';
+    slide.style.cssText=`width:${W}px;min-width:${W}px;max-width:${W}px;height:100vh`;
+
+    const wrap=document.createElement('div');
+    wrap.className='shirt-wrap';
+
+    if(art.shirtImg){ const img=document.createElement('img'); img.className='shirt-img'; img.src=art.shirtImg; img.draggable=false; wrap.appendChild(img); }
+    else wrap.insertAdjacentHTML('beforeend',svgShirt());
+
+    // article counter below shirt
+    const artNum=document.createElement('div');
+    artNum.className='art-counter';
+    artNum.textContent=String(i+1).padStart(3,'0')+' / '+String(total).padStart(3,'0');
+
+    wrap.insertAdjacentHTML('beforeend',`
+      <div class="ring"></div>
+      <span class="deg-el">0°</span>
+      <div class="detail-panel">
+        <div class="p-title">${art.name||'Untitled'}</div>
+        <div class="p-sub">${art.sub||''}</div>
+        <p class="p-desc">${art.desc||''}</p>
+        ${szTable(art.sizes)}
+      </div>`);
+    wrap.appendChild(artNum);
+
+    slide.appendChild(wrap);
+    trackEl.appendChild(slide);
+    attachShirt(wrap,art);
   });
-});
+  setTrackPos(false);
+  renderDots();
+  updateCounter();
+}
 
-/* ─── Image store (base64 data URLs) ───────────────────────── */
-const imgs = { bg: null, shirt: null, c1: null, c2: null, c3: null, c4: null };
+/* ══════════════════════════════════
+   SHIRT — rotation + hold
+══════════════════════════════════ */
+function attachShirt(wrap,art){
+  let dragging=false,held=false,sx=0,deg=0,htimer=null;
+  const img=wrap.querySelector('.shirt-img');
+  const degEl=wrap.querySelector('.deg-el');
 
-function bindUpload(inputId, thumbId, storeKey) {
-  const inp = document.getElementById(inputId);
-  const th  = document.getElementById(thumbId);
-  if(!inp) return;
-  inp.addEventListener('change', () => {
-    const file = inp.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      imgs[storeKey] = ev.target.result;
-      if(th){ th.src = ev.target.result; th.classList.add('show'); }
-    };
-    reader.readAsDataURL(file);
+  function applyRot(d){
+    const n=((d%360)+360)%360, rad=(n*Math.PI)/180;
+    const cx=Math.cos(rad),ab=Math.abs(cx);
+    img.style.transform=`scaleX(${cx<0?-ab:ab}) skewY(${Math.sin(rad)*5}deg)`;
+    degEl.textContent=Math.round(n)+'°';
+  }
+  function startHold(){ held=true; wrap.classList.add('active'); showHoldBg(art); cur.classList.add('press'); }
+  function endHold(){ held=false; wrap.classList.remove('active'); hideHoldBg(); cur.classList.remove('press'); }
+  function beginDrag(x){ dragging=true; sx=x; wrap.classList.add('dragging'); cur.classList.add('drag'); htimer=setTimeout(startHold,200); }
+  function moveDrag(x){ if(!dragging) return; const d=x-sx; sx=x; deg+=d*.55; applyRot(deg); }
+  function endDrag(){ clearTimeout(htimer); dragging=false; wrap.classList.remove('dragging'); cur.classList.remove('drag'); endHold(); }
+
+  wrap.addEventListener('mousedown',e=>{ e.stopPropagation(); beginDrag(e.clientX); });
+  document.addEventListener('mousemove',e=>moveDrag(e.clientX));
+  document.addEventListener('mouseup',endDrag);
+  wrap.addEventListener('mouseenter',()=>{ if(!dragging) cur.classList.add('drag'); });
+  wrap.addEventListener('mouseleave',()=>{ if(!dragging) cur.classList.remove('drag'); });
+  wrap.addEventListener('touchstart',e=>{ e.stopPropagation(); beginDrag(e.touches[0].clientX); },{passive:true});
+  wrap.addEventListener('touchmove',e=>{ moveDrag(e.touches[0].clientX); e.preventDefault(); },{passive:false});
+  wrap.addEventListener('touchend',endDrag);
+}
+
+/* ══════════════════════════════════
+   NAVIGATION
+══════════════════════════════════ */
+function setTrackPos(anim){
+  const W=window.innerWidth;
+  if(anim){ trackEl.style.transition='transform .55s cubic-bezier(.25,.46,.45,.94)'; setTimeout(()=>trackEl.style.transition='none',600); }
+  else trackEl.style.transition='none';
+  trackEl.style.transform=`translateX(-${curIdx*W}px)`;
+}
+function goTo(i,anim=true){
+  if(i<0||i>=store.articles.length) return;
+  curIdx=i; setTrackPos(anim); renderDots(); updateCounter();
+}
+function renderDots(){
+  const el=document.getElementById('dotsEl'); el.innerHTML='';
+  if(store.articles.length<=1) return;
+  store.articles.forEach((_,i)=>{ const d=document.createElement('div'); d.className='dot'+(i===curIdx?' active':''); d.addEventListener('click',()=>goTo(i)); el.appendChild(d); });
+}
+function updateCounter(){
+  // counter is now on each shirt-wrap, rendered in renderTrack
+}
+
+// swipe on background
+let swSX=0,swDX=0,swSY=0,swLocked=false;
+const sc=document.getElementById('swipeCont');
+sc.addEventListener('mousedown',e=>{ if(e.target.closest('.shirt-wrap')) return; swSX=e.clientX; swDX=0; });
+document.addEventListener('mousemove',e=>{ if(!swSX||e.target.closest('.shirt-wrap')) return; swDX=e.clientX-swSX; });
+document.addEventListener('mouseup',()=>{ if(!swSX) return; if(Math.abs(swDX)>60){ swDX<0?goTo(curIdx+1):goTo(curIdx-1); } swSX=0;swDX=0; });
+sc.addEventListener('touchstart',e=>{ if(e.target.closest('.shirt-wrap')) return; swSX=e.touches[0].clientX; swSY=e.touches[0].clientY; swLocked=false; swDX=0; },{passive:true});
+sc.addEventListener('touchmove',e=>{ if(!swSX||e.target.closest('.shirt-wrap')) return; const dx=e.touches[0].clientX-swSX,dy=e.touches[0].clientY-swSY; if(!swLocked){ swLocked=true; if(Math.abs(dy)>Math.abs(dx)){ swSX=0; return; } } swDX=dx; },{passive:true});
+sc.addEventListener('touchend',()=>{ if(!swSX) return; if(Math.abs(swDX)>60){ swDX<0?goTo(curIdx+1):goTo(curIdx-1); } swSX=0;swDX=0; });
+document.addEventListener('keydown',e=>{ e.key==='ArrowRight'&&goTo(curIdx+1); e.key==='ArrowLeft'&&goTo(curIdx-1); });
+window.addEventListener('resize',()=>{ const W=window.innerWidth; document.querySelectorAll('.slide').forEach(s=>{ s.style.width=W+'px'; s.style.minWidth=W+'px'; s.style.maxWidth=W+'px'; }); setTrackPos(false); });
+
+/* ══════════════════════════════════
+   APPLY GLOBAL SETTINGS
+══════════════════════════════════ */
+function applyGlobal(){
+  document.getElementById('availTxt').textContent=store.availText;
+
+  // Logo
+  const logoImg=document.getElementById('logoImg');
+  const logoText=document.getElementById('logoText');
+  if(store.logoImg){
+    logoImg.src=store.logoImg; logoImg.classList.add('show'); logoText.style.display='none';
+  } else {
+    logoImg.classList.remove('show'); logoText.style.display='';
+  }
+
+  // Ticker
+  const items=store.ticker.split('|').filter(Boolean);
+  const dbl=[...items,...items];
+  document.getElementById('tickerTrack').innerHTML=dbl.map(t=>`<span class="ticker-item">${t}</span>`).join('');
+
+  // Site BG
+  if(store.siteBg){ siteBgLayer.style.backgroundImage=`url(${store.siteBg})`; siteBgLayer.classList.add('on'); }
+  else siteBgLayer.classList.remove('on');
+}
+
+/* ══════════════════════════════════
+   CMS
+══════════════════════════════════ */
+const cmsOv=document.getElementById('cms-overlay');
+document.getElementById('cms-x').addEventListener('click',closeCMS);
+document.getElementById('cms-backdrop').addEventListener('click',closeCMS);
+
+function openCMS(){
+  cmsOv.classList.add('open');
+  document.getElementById('g-avail').value=store.availText;
+  document.getElementById('g-ticker').value=store.ticker;
+  document.getElementById('g-new-pw').value='';
+  const psb=document.getElementById('pv-site-bg');
+  store.siteBg?(psb.src=store.siteBg,psb.classList.add('show')):(psb.src='',psb.classList.remove('show'));
+  const pLogo=document.getElementById('pv-logo');
+  store.logoImg?(pLogo.src=store.logoImg,pLogo.classList.add('show')):(pLogo.src='',pLogo.classList.remove('show'));
+  renderTabs(); loadEditor(cmsIdx);
+}
+function closeCMS(){
+  cmsOv.classList.remove('open');
+  window.location.hash='';
+}
+
+function renderTabs(){
+  const el=document.getElementById('artTabs'); el.innerHTML='';
+  store.articles.forEach((art,i)=>{
+    const b=document.createElement('button'); b.className='art-tab'+(i===cmsIdx?' active':'');
+    b.textContent=`#${i+1} ${art.name||'Untitled'}`;
+    b.addEventListener('click',()=>{ cmsIdx=i; renderTabs(); loadEditor(i); }); el.appendChild(b);
   });
 }
-bindUpload('f-bg-file',   'bg-thumb', 'bg');
-bindUpload('f-shirt-file','shirt-thumb','shirt');
-bindUpload('f-img-1','th-1','c1');
-bindUpload('f-img-2','th-2','c2');
-bindUpload('f-img-3','th-3','c3');
-bindUpload('f-img-4','th-4','c4');
-
-// URL-based background
-document.getElementById('f-bg-url').addEventListener('input', function(){
-  if(this.value.trim()) imgs.bg = 'url(' + this.value.trim() + ')';
-});
-
-/* ─── Color pair sync ───────────────────────────────────────── */
-[['cp-birch','ct-birch'],['cp-spruce','ct-spruce'],['cp-cream','ct-cream'],
- ['cp-dusk','ct-dusk'],['cp-rust','ct-rust'],['cp-bark','ct-bark']].forEach(([pid,tid]) => {
-  const pc = document.getElementById(pid);
-  const tc = document.getElementById(tid);
-  pc.addEventListener('input', () => { tc.value = pc.value; });
-  tc.addEventListener('input', () => { if(/^#[0-9a-fA-F]{6}$/.test(tc.value)) pc.value = tc.value; });
-});
-
-/* ─── APPLY ─────────────────────────────────────────────────── */
-document.getElementById('cms-apply').addEventListener('click', applyAll);
-
-function val(id) { return document.getElementById(id).value; }
-
-function setCardImage(n, src) {
-  const box = document.getElementById(`ci-${n}`);
-  const ph  = box.querySelector('.card-img-ph');
-  let img   = box.querySelector('img');
-  if(!img) { img = document.createElement('img'); box.appendChild(img); }
-  img.src = src;
-  img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
-  if(ph) ph.style.display = 'none';
+function loadEditor(i){
+  const art=store.articles[i]; if(!art) return;
+  document.getElementById('a-name').value=art.name||'';
+  document.getElementById('a-sub').value=art.sub||'';
+  document.getElementById('a-desc').value=art.desc||'';
+  document.getElementById('a-hold-color').value=art.holdColor||'';
+  document.getElementById('a-sizes').value=(art.sizes||[]).map(r=>`${r.s},${r.c},${r.l},${r.sh}`).join('\n');
+  const ps=document.getElementById('pv-shirt');
+  art.shirtImg?(ps.src=art.shirtImg,ps.classList.add('show')):(ps.src='',ps.classList.remove('show'));
+  const phb=document.getElementById('pv-hold-bg');
+  art.holdBg?(phb.src=art.holdBg,phb.classList.add('show')):(phb.src='',phb.classList.remove('show'));
 }
 
-function applyAll() {
-  /* Brand / nav */
-  document.getElementById('s-logo').textContent    = val('f-logo');
-  document.getElementById('s-nav-tag').textContent = val('f-nav-tag');
-  document.getElementById('s-footer-logo').textContent = val('f-footer-logo');
-  document.getElementById('s-footer-copy').textContent = val('f-footer-copy');
+function fileB64(file,cb){ const r=new FileReader(); r.onload=e=>cb(e.target.result); r.readAsDataURL(file); }
 
-  /* Hero text */
-  document.getElementById('s-hero-season').textContent = val('f-season');
-  const titleRaw = val('f-title');
-  const highlight = val('f-highlight');
-  let titleHTML = titleRaw.split('|').join('<br/>');
-  if(highlight) titleHTML = titleHTML.replace(highlight, `<span class="hl">${highlight}</span>`);
-  document.getElementById('s-hero-title').innerHTML = titleHTML;
+// Logo upload
+document.getElementById('f-logo').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  fileB64(f,b=>{ store.logoImg=b; const p=document.getElementById('pv-logo'); p.src=b; p.classList.add('show'); });
+});
+document.getElementById('remove-logo-btn').addEventListener('click',()=>{
+  store.logoImg=null;
+  const p=document.getElementById('pv-logo'); p.src=''; p.classList.remove('show');
+});
 
-  /* Hero background */
-  const bgEl = document.getElementById('hero-bg-el');
-  if(imgs.bg) {
-    if(imgs.bg.startsWith('data:')) {
-      bgEl.style.backgroundImage = `url(${imgs.bg})`;
-    } else {
-      bgEl.style.backgroundImage = imgs.bg.startsWith('url(') ? imgs.bg : `url(${imgs.bg})`;
-    }
-    bgEl.style.backgroundSize     = 'cover';
-    bgEl.style.backgroundPosition = 'center';
-  }
+// File uploads
+document.getElementById('f-shirt').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; fileB64(f,b=>{ store.articles[cmsIdx].shirtImg=b; const p=document.getElementById('pv-shirt'); p.src=b; p.classList.add('show'); }); });
+document.getElementById('f-hold-bg').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; fileB64(f,b=>{ store.articles[cmsIdx].holdBg=b; const p=document.getElementById('pv-hold-bg'); p.src=b; p.classList.add('show'); }); });
+document.getElementById('f-site-bg').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; fileB64(f,b=>{ store.siteBg=b; const p=document.getElementById('pv-site-bg'); p.src=b; p.classList.add('show'); siteBgLayer.style.backgroundImage=`url(${b})`; siteBgLayer.classList.add('on'); }); });
 
-  /* Shirt image */
-  if(imgs.shirt) {
-    const inner = document.getElementById('hero-shirt-inner');
-    const ph    = document.getElementById('shirt-ph');
-    let img = inner.querySelector('img');
-    if(!img) { img = document.createElement('img'); inner.appendChild(img); }
-    img.src = imgs.shirt;
-    img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;';
-    if(ph) ph.style.display = 'none';
-  }
+// Add article
+document.getElementById('addArtBtn').addEventListener('click',()=>{
+  store.articles.push({id:Date.now(),name:'New Shirt',sub:'',desc:'',shirtImg:null,holdBg:null,holdColor:'#111',sizes:[{s:'S',c:'104',l:'72',sh:'48'}]});
+  cmsIdx=store.articles.length-1; renderTabs(); loadEditor(cmsIdx); renderTrack();
+});
 
-  /* Gallery header */
-  document.getElementById('s-det-label').textContent = val('f-det-label');
-  document.getElementById('s-det-title').innerHTML   = val('f-det-title');
-  document.getElementById('s-det-sub').textContent   = val('f-det-sub');
+// Delete article
+document.getElementById('delArtBtn').addEventListener('click',()=>{
+  if(store.articles.length<=1){ alert('You must have at least one article.'); return; }
+  if(!confirm(`Delete "${store.articles[cmsIdx].name}"? This cannot be undone.`)) return;
+  store.articles.splice(cmsIdx,1);
+  cmsIdx=Math.max(0,cmsIdx-1);
+  if(curIdx>=store.articles.length) curIdx=store.articles.length-1;
+  saveStore(); renderTabs(); loadEditor(cmsIdx); renderTrack();
+});
 
-  /* Polaroid captions & images */
-  [1,2,3,4].forEach(n => {
-    document.getElementById(`csub-${n}`).textContent = val(`f-csub-${n}`);
-    document.getElementById(`ctit-${n}`).textContent = val(`f-ctit-${n}`);
-    const src = imgs[`c${n}`];
-    if(src) setCardImage(n, src);
+// Change password
+document.getElementById('change-pw-btn').addEventListener('click',()=>{
+  const np=document.getElementById('g-new-pw').value.trim();
+  if(!np){ alert('Please enter a new password.'); return; }
+  setPassword(np);
+  document.getElementById('g-new-pw').value='';
+  alert('Password updated.');
+});
+
+// SAVE ALL
+document.getElementById('saveArtBtn').addEventListener('click',()=>{
+  // Save current article editor fields
+  const art=store.articles[cmsIdx];
+  art.name=document.getElementById('a-name').value;
+  art.sub=document.getElementById('a-sub').value;
+  art.desc=document.getElementById('a-desc').value;
+  art.holdColor=document.getElementById('a-hold-color').value;
+  art.sizes=document.getElementById('a-sizes').value.trim().split('\n').filter(Boolean).map(l=>{
+    const[s,c,le,sh]=l.split(',').map(x=>x.trim()); return{s,c,l:le,sh};
   });
+  // Global
+  store.availText=document.getElementById('g-avail').value;
+  store.ticker=document.getElementById('g-ticker').value;
 
-  /* Specs */
-  for(let i=1;i<=7;i++){
-    document.getElementById(`sk-${i}`).textContent = val(`sk${i}`);
-    document.getElementById(`sv-${i}`).textContent = val(`sv${i}`);
-  }
-  document.getElementById('s-size-note').textContent = val('f-size-note');
+  // Persist to localStorage
+  saveStore();
+  applyGlobal();
+  renderTrack();
+  renderTabs();
 
-  /* CTA / Drop section */
-  document.getElementById('s-drop-eyebrow').textContent = val('f-eyebrow');
-  document.getElementById('s-drop-main').innerHTML      = val('f-drop-title').split('|').join('<br/>');
-  document.getElementById('s-drop-sub').textContent     = val('f-drop-sub');
-  document.getElementById('s-drop-body').textContent    = val('f-drop-body');
-  document.getElementById('s-btn-text').textContent     = val('f-btn-text');
-  document.getElementById('s-btn').href                 = val('f-btn-url');
-  document.getElementById('s-stock').textContent        = val('f-stock');
-
-  /* Colors */
-  const r = document.documentElement.style;
-  r.setProperty('--birch',  val('ct-birch'));
-  r.setProperty('--spruce', val('ct-spruce'));
-  r.setProperty('--cream',  val('ct-cream'));
-  r.setProperty('--dusk',   val('ct-dusk'));
-  r.setProperty('--rust',   val('ct-rust'));
-  r.setProperty('--bark',   val('ct-bark'));
-
-  toast('✓ All changes applied!');
-}
-
-/* ─── Reset ─────────────────────────────────────────────────── */
-document.getElementById('cms-reset').addEventListener('click', () => {
-  if(confirm('Reset everything back to defaults?')) location.reload();
+  // Confirm flash
+  const conf=document.getElementById('save-confirm');
+  conf.classList.add('show');
+  setTimeout(()=>conf.classList.remove('show'),2500);
 });
 
-/* ─── Toast ─────────────────────────────────────────────────── */
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2400);
-}
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+applyGlobal();
+renderTrack();
 </script>
 </body>
 </html>
