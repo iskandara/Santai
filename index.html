@@ -127,9 +127,10 @@ footer{
   width:100%;height:100%;
   object-fit:contain;display:block;
   pointer-events:none;
-  transition:filter .4s, opacity .4s;
+  transition:filter .4s;
   filter:drop-shadow(0 24px 56px rgba(0,0,0,var(--shadow-opacity, 0.14)));
   will-change:transform;
+  opacity:1 !important;
 }
 .shirt-wrap.held .shirt-img{
   filter:drop-shadow(0 24px 56px rgba(0,0,0,var(--shadow-opacity, 0.14))) brightness(.9);
