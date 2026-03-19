@@ -18,6 +18,8 @@ html,body{width:100%;height:100%;overflow:hidden;cursor:none;font-family:'Courie
 
 #site-bg-layer{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center;opacity:0;transition:opacity .7s;pointer-events:none}
 #site-bg-layer.on{opacity:1}
+#hold-bg-layer{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;opacity:0;transition:opacity .35s;pointer-events:none}
+#hold-bg-layer.on{opacity:1}
 
 .grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.032;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px}
 
@@ -254,6 +256,7 @@ footer{
 
 <div id="cursor"></div>
 <div id="site-bg-layer"></div>
+<div id="hold-bg-layer"></div>
 <div class="grain"></div>
 
 <!-- LOADING -->
@@ -489,6 +492,7 @@ function tryLogin(){
    BG LAYER
 ══════════════════════════ */
 const siteBgLayer=document.getElementById('site-bg-layer');
+const holdBgLayer=document.getElementById('hold-bg-layer');
 
 /* ══════════════════════════
    SVG FALLBACK
@@ -594,14 +598,20 @@ function attachShirt(wrap, art){
 
   function startHold(){
     held=true; wrap.classList.add('held');
-    if(art.hold_bg){ siteBgLayer.style.backgroundImage=`url(${art.hold_bg})`; siteBgLayer.style.background=''; siteBgLayer.classList.add('on'); }
-    else if(art.hold_color){ siteBgLayer.style.background=art.hold_color; siteBgLayer.style.backgroundImage='none'; siteBgLayer.classList.add('on'); }
+    if(art.hold_bg){
+      holdBgLayer.style.background='';
+      holdBgLayer.style.backgroundImage=`url(${art.hold_bg})`;
+      holdBgLayer.classList.add('on');
+    } else if(art.hold_color){
+      holdBgLayer.style.backgroundImage='none';
+      holdBgLayer.style.background=art.hold_color;
+      holdBgLayer.classList.add('on');
+    }
     cur.classList.add('press');
   }
   function endHold(){
     held=false; wrap.classList.remove('held');
-    if(globalData.site_bg){ siteBgLayer.style.background=''; siteBgLayer.style.backgroundImage=`url(${globalData.site_bg})`; siteBgLayer.classList.add('on'); }
-    else { siteBgLayer.style.background=''; siteBgLayer.style.backgroundImage=''; siteBgLayer.classList.remove('on'); }
+    holdBgLayer.classList.remove('on');
     cur.classList.remove('press');
   }
   function beginDrag(x){ dragging=true; sx=x; wrap.classList.add('dragging'); cur.classList.add('drag'); htimer=setTimeout(startHold,200); }
