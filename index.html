@@ -85,11 +85,11 @@ footer{
 .swipe-cont{
   width:100%;height:100%;
   position:relative;overflow:hidden;
-  display:flex;align-items:flex-start;
+  display:flex;align-items:center;
 }
 .track{
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   height:100%;
   will-change:transform;
 }
@@ -107,7 +107,6 @@ footer{
 /* ── SHIRT WRAPPER ── */
 .shirt-section{
   width:100%;
-  /* fill the visible stage height exactly */
   height:100%;
   min-height:100%;
   display:flex;
@@ -143,15 +142,17 @@ footer{
 }
 .shirt-wrap.dragging .deg-el{opacity:1}
 
-/* article counter pinned below shirt */
+/* article counter — absolute inside shirt-wrap at bottom */
 .art-counter{
-  margin-top:14px;
+  position:absolute;
+  bottom:12px;
+  left:50%;transform:translateX(-50%);
   font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--mid);
-  text-align:center;pointer-events:none;
+  white-space:nowrap;pointer-events:none;
   transition:opacity .3s;
-  flex-shrink:0;
+  z-index:5;
 }
-.shirt-wrap.dragging ~ .art-counter{opacity:0}
+.shirt-wrap.dragging .art-counter{opacity:0}
 
 /* ── DETAIL PANEL (overlay on shirt, shown on hold) ── */
 .detail-panel{
@@ -246,7 +247,6 @@ footer{
     width:min(100vw, calc((100vh - var(--header-h) - var(--footer-h) - var(--ticker-h)) * 0.75));
     max-width:100vw;
   }
-  .info-panel{padding:24px 20px 40px}
   footer{padding:0 20px}
   header{padding:0 16px}
 }
@@ -570,9 +570,9 @@ function renderTrack(){
     const counter=document.createElement('div');
     counter.className='art-counter';
     counter.textContent=String(i+1).padStart(3,'0')+' / '+String(total).padStart(3,'0');
+    wrap.appendChild(counter);
 
     shirtSection.appendChild(wrap);
-    shirtSection.appendChild(counter);
     slide.appendChild(shirtSection);
     trackEl.appendChild(slide);
     attachShirt(wrap, art);
