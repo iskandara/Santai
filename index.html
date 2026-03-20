@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SANTAI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Bebas+Neue&family=Courier+Prime&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://iddwjrusnkvblezkrqjz.supabase.co">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Bebas+Neue&family=Courier+Prime&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Bebas+Neue&family=Courier+Prime&display=swap" rel="stylesheet"></noscript>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f5f5f0;--fg:#0a0a0a;--mid:#888;--border:rgba(0,0,0,0.12);--header-h:72px;--footer-h:52px;--ticker-h:22px}
+:root{--bg:#f5f5f0;--fg:#0a0a0a;--mid:#888;--border:rgba(0,0,0,0.12);--header-h:96px;--footer-h:52px;--ticker-h:22px}
 html,body{width:100%;height:100%;overflow:hidden;cursor:none;font-family:'Courier Prime',monospace;background:var(--bg);color:var(--fg)}
 
 #cursor{position:fixed;top:0;left:0;z-index:9999;width:10px;height:10px;background:var(--fg);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .25s,border .2s}
@@ -27,14 +30,27 @@ html,body{width:100%;height:100%;overflow:hidden;cursor:none;font-family:'Courie
 header{
   position:fixed;top:0;left:0;right:0;z-index:200;
   height:var(--header-h);
-  display:flex;align-items:center;justify-content:center;
-  padding:0 24px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+  padding:0;
   animation:fadeUp .9s .1s both;
 }
-.logo-wrap{display:flex;align-items:center;justify-content:center}
+.logo-wrap{display:flex;align-items:center;justify-content:center;padding:14px 24px 8px}
 .logo-text{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3vw,32px);letter-spacing:.38em;line-height:1}
-.logo-img{max-height:40px;max-width:160px;object-fit:contain;display:none}
+.logo-img{max-height:36px;max-width:150px;object-fit:contain;display:none}
 .logo-img.show{display:block}
+
+/* ── HEADER TICKER (inside header, under logo) ── */
+.header-ticker-wrap{
+  width:100%;overflow:hidden;
+  border-top:1px solid var(--border);
+  padding:4px 0;
+  height:var(--ticker-h);
+  display:flex;align-items:center;
+  pointer-events:none;
+}
+.header-ticker-track{display:flex;gap:72px;animation:ticker 22s linear infinite;width:max-content}
+.header-ticker-item{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--mid);white-space:nowrap}
 
 /* ── FOOTER ── */
 footer{
@@ -51,33 +67,12 @@ footer{
 .dot{width:5px;height:5px;border-radius:50%;background:var(--fg);opacity:.22;transition:opacity .3s,transform .3s;cursor:none}
 .dot.active{opacity:1;transform:scale(1.5)}
 
-/* ── TICKER ── */
-.ticker-wrap{
-  position:fixed;
-  bottom:var(--footer-h);
-  left:0;right:0;z-index:150;
-  overflow:hidden;
-  border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
-  padding:4px 0;
-  pointer-events:none;
-  height:var(--ticker-h);
-  display:flex;align-items:center;
-}
-.ticker-track{display:flex;gap:72px;animation:ticker 22s linear infinite;width:max-content}
-.ticker-item{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--mid);white-space:nowrap}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
 /* ── STAGE ── */
-/* 
-  Full available area = viewport - header - footer - ticker
-  We use a scroll container so info panel sits below shirt on scroll
-*/
 .stage{
   position:fixed;
   top:var(--header-h);
   left:0;right:0;
-  bottom:calc(var(--footer-h) + var(--ticker-h));
+  bottom:var(--footer-h);
   z-index:10;
   overflow:hidden;
   animation:fadeUp 1.1s .3s both;
@@ -117,8 +112,8 @@ footer{
 }
 .shirt-wrap{
   position:relative;
-  height:calc(100vh - var(--header-h) - var(--footer-h) - var(--ticker-h));
-  width:min(100vw, calc((100vh - var(--header-h) - var(--footer-h) - var(--ticker-h)) * 0.75));
+  height:calc(100vh - var(--header-h) - var(--footer-h));
+  width:min(100vw, calc((100vh - var(--header-h) - var(--footer-h)) * 0.75));
   max-width:800px;
   user-select:none;
 }
@@ -173,6 +168,19 @@ footer{
 .sz td{padding:5px 0;border-bottom:1px solid rgba(245,245,240,.07)}
 .sz tr:last-child td{border-bottom:none}
 
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── HOLD ROTATE HINT ── */
+.hold-hint{
+  position:absolute;
+  bottom:28px;left:50%;transform:translateX(-50%);
+  font-size:8px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--mid);white-space:nowrap;pointer-events:none;
+  animation:hintBlink 3s ease-in-out infinite;
+  transition:opacity .6s ease;
+}
+.hold-hint.hidden{opacity:0;pointer-events:none}
+@keyframes hintBlink{0%,100%{opacity:.35}50%{opacity:.12}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── LOADING ── */
@@ -241,14 +249,14 @@ footer{
 
 /* mobile tweaks */
 @media(max-width:600px){
-  :root{--header-h:56px;--footer-h:44px}
+  :root{--header-h:80px;--footer-h:44px}
   .shirt-wrap{
-    height:calc(100vh - var(--header-h) - var(--footer-h) - var(--ticker-h));
-    width:min(100vw, calc((100vh - var(--header-h) - var(--footer-h) - var(--ticker-h)) * 0.75));
+    height:calc(100vh - var(--header-h) - var(--footer-h));
+    width:min(100vw, calc((100vh - var(--header-h) - var(--footer-h)) * 0.75));
     max-width:100vw;
   }
   footer{padding:0 20px}
-  header{padding:0 16px}
+  .logo-wrap{padding:10px 16px 6px}
 }
 </style>
 </head>
@@ -268,8 +276,11 @@ footer{
 <!-- HEADER -->
 <header>
   <div class="logo-wrap">
-    <img class="logo-img" id="logoImg" src="" alt="SANTAI"/>
+    <img class="logo-img" id="logoImg" src="" alt="SANTAI" loading="eager"/>
     <div class="logo-text" id="logoText">SANTAI</div>
+  </div>
+  <div class="header-ticker-wrap">
+    <div class="header-ticker-track" id="tickerTrack"></div>
   </div>
 </header>
 
@@ -279,9 +290,6 @@ footer{
     <div class="track" id="track"></div>
   </div>
 </div>
-
-<!-- TICKER -->
-<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack"></div></div>
 
 <!-- FOOTER -->
 <footer>
@@ -443,22 +451,46 @@ let globalData={}, articles=[], curIdx=0, cmsIdx=0;
 let pendingFiles={ logo:null, siteBg:null, shirtImg:null, holdBg:null };
 
 /* ══════════════════════════
-   LOAD
+   LOAD — stale-while-revalidate
+   Shows cached data instantly, then refreshes from Supabase in background
 ══════════════════════════ */
+const CACHE_KEY = 'santai_cache_v1';
+
 async function loadData(){
   setBar(20);
+  // 1. Try cache first — render instantly if available
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if(cached){
+      const { g, a } = JSON.parse(cached);
+      globalData = g; articles = a;
+      setBar(60);
+      applyGlobal(); renderTrack(); hideLoading();
+    }
+  } catch(e){}
+
+  // 2. Always fetch fresh from Supabase in background
   try {
     const [g,a] = await Promise.all([
       sbGet('santai_global','id=eq.1'),
       sbGet('santai_articles','order=sort_order.asc')
     ]);
-    globalData = g[0]||{};
-    articles   = a||[];
-    setBar(88);
+    const newG = g[0]||{}, newA = a||[];
+    // Only re-render if data actually changed
+    if(JSON.stringify(newG)!==JSON.stringify(globalData) || JSON.stringify(newA)!==JSON.stringify(articles)){
+      globalData = newG; articles = newA;
+      applyGlobal(); renderTrack();
+    }
+    localStorage.setItem(CACHE_KEY, JSON.stringify({g:globalData, a:articles}));
+    setBar(100);
+    if(!document.getElementById('loading-screen').classList.contains('fade')) hideLoading();
   } catch(e){
-    console.warn('Load error:',e);
-    globalData={ avail_text:'Available Now', ticker:'SANTAI|One Shirt. One Season.', site_bg:null, logo_img:null };
-    articles=[{ id:1, sort_order:0, name:'The Void Shirt', sub:'SS25 — Drop 01', description:'Heavyweight 340gsm poplin. Tonal embroidery at chest.', shirt_img:null, hold_bg:null, hold_color:'#1a1a2e', sizes:'S,104,72,48\nM,110,75,51\nL,116,78,54\nXL,122,81,57' }];
+    console.warn('Supabase fetch error:',e);
+    if(!articles.length){
+      globalData={ avail_text:'Available Now', ticker:'SANTAI|One Shirt. One Season.', site_bg:null, logo_img:null };
+      articles=[{ id:1, sort_order:0, name:'The Void Shirt', sub:'SS25 — Drop 01', description:'Heavyweight 340gsm poplin.', shirt_img:null, hold_bg:null, hold_color:'#1a1a2e', sizes:'S,104,72,48\nM,110,75,51\nL,116,78,54\nXL,122,81,57' }];
+      applyGlobal(); renderTrack(); hideLoading();
+    }
   }
 }
 
@@ -525,7 +557,7 @@ function applyGlobal(){
   if(g.logo_img){ li.src=g.logo_img; li.classList.add('show'); lt.style.display='none'; }
   else { li.classList.remove('show'); lt.style.display=''; }
   const items=(g.ticker||'SANTAI').split('|').filter(Boolean);
-  document.getElementById('tickerTrack').innerHTML=[...items,...items].map(t=>`<span class="ticker-item">${t}</span>`).join('');
+  document.getElementById('tickerTrack').innerHTML=[...items,...items].map(t=>`<span class="header-ticker-item">${t}</span>`).join('');
   if(g.site_bg){ siteBgLayer.style.backgroundImage=`url(${g.site_bg})`; siteBgLayer.classList.add('on'); }
   else siteBgLayer.classList.remove('on');
 }
@@ -554,8 +586,13 @@ function renderTrack(){
 
     const wrap=document.createElement('div');
     wrap.className='shirt-wrap';
-    if(art.shirt_img){ const img=document.createElement('img'); img.className='shirt-img'; img.src=art.shirt_img; img.draggable=false; wrap.appendChild(img); }
-    else wrap.insertAdjacentHTML('beforeend',svgShirt());
+    if(art.shirt_img){
+      const img=document.createElement('img');
+      img.className='shirt-img'; img.src=art.shirt_img; img.draggable=false;
+      img.loading= i===0 ? 'eager' : 'lazy';
+      img.decoding='async';
+      wrap.appendChild(img);
+    } else wrap.insertAdjacentHTML('beforeend',svgShirt());
 
     wrap.insertAdjacentHTML('beforeend',`
       <div class="ring"></div>
@@ -565,7 +602,8 @@ function renderTrack(){
         <div class="p-sub">${art.sub||''}</div>
         <p class="p-desc">${art.description||''}</p>
         ${szTable(art.sizes||'')}
-      </div>`);
+      </div>
+      <div class="hold-hint">Hold &amp; Rotate</div>`);
 
     const counter=document.createElement('div');
     counter.className='art-counter';
@@ -588,7 +626,9 @@ function attachShirt(wrap, art){
   let dragging=false, held=false, sx=0, deg=0, htimer=null;
   const img=wrap.querySelector('.shirt-img');
   const degEl=wrap.querySelector('.deg-el');
+  const hint=wrap.querySelector('.hold-hint');
 
+  function dismissHint(){ if(hint) hint.classList.add('hidden'); }
 
   function applyRot(d){
     const n=((d%360)+360)%360, rad=(n*Math.PI)/180;
@@ -599,6 +639,7 @@ function attachShirt(wrap, art){
 
   function startHold(){
     held=true; wrap.classList.add('held');
+    dismissHint();
     if(art.hold_bg){
       holdBgLayer.style.background='';
       holdBgLayer.style.backgroundImage=`url(${art.hold_bg})`;
@@ -615,7 +656,13 @@ function attachShirt(wrap, art){
     holdBgLayer.classList.remove('on');
     cur.classList.remove('press');
   }
-  function beginDrag(x){ dragging=true; sx=x; wrap.classList.add('dragging'); cur.classList.add('drag'); htimer=setTimeout(startHold,200); }
+  function beginDrag(x){
+    dragging=true; sx=x;
+    wrap.classList.add('dragging');
+    cur.classList.add('drag');
+    dismissHint();
+    htimer=setTimeout(startHold,200);
+  }
   function moveDrag(x){ if(!dragging) return; const d=x-sx; sx=x; deg+=d*.55; applyRot(deg); }
   function endDrag(){ clearTimeout(htimer); dragging=false; wrap.classList.remove('dragging'); cur.classList.remove('drag'); endHold(); }
 
@@ -780,6 +827,7 @@ document.getElementById('saveBtn').addEventListener('click',async()=>{
     articles[cmsIdx]={...art,...na};
 
     pendingFiles={logo:null,siteBg:null,shirtImg:null,holdBg:null};
+    localStorage.setItem(CACHE_KEY, JSON.stringify({g:globalData, a:articles}));
     applyGlobal(); renderTrack(); renderTabs();
     btn.innerHTML='SAVE ALL CHANGES'; btn.disabled=false;
     conf.classList.add('show'); setTimeout(()=>conf.classList.remove('show'),3000);
@@ -796,9 +844,6 @@ document.getElementById('saveBtn').addEventListener('click',async()=>{
 ══════════════════════════ */
 (async()=>{
   await loadData();
-  applyGlobal();
-  renderTrack();
-  hideLoading();
 })();
 </script>
 </body>
