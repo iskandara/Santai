@@ -67,6 +67,21 @@ footer{
 .dot{width:5px;height:5px;border-radius:50%;background:var(--fg);opacity:.22;transition:opacity .3s,transform .3s;cursor:none}
 .dot.active{opacity:1;transform:scale(1.5)}
 
+/* ── ARROW NAV ── */
+.nav-wrap{display:flex;align-items:center;gap:16px}
+.nav-arrows{display:flex;align-items:center;gap:4px}
+.nav-btn{
+  background:none;border:none;padding:0;
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:none;color:var(--fg);
+  opacity:.35;transition:opacity .2s;
+  flex-shrink:0;
+}
+.nav-btn:hover{opacity:1}
+.nav-btn:disabled{opacity:.12;cursor:not-allowed}
+.nav-btn svg{display:block;pointer-events:none}
+
 /* ── STAGE ── */
 .stage{
   position:fixed;
@@ -294,7 +309,17 @@ footer{
 <!-- FOOTER -->
 <footer>
   <div class="avail-wrap"><div class="avail-dot"></div><span id="availTxt">—</span></div>
-  <div class="dots" id="dotsEl"></div>
+  <div class="nav-wrap">
+    <div class="dots" id="dotsEl"></div>
+    <div class="nav-arrows">
+      <button class="nav-btn" id="navPrev" aria-label="Previous">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="nav-btn" id="navNext" aria-label="Next">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
 </footer>
 
 <!-- PASSWORD GATE -->
@@ -617,6 +642,7 @@ function renderTrack(){
   });
   setTrackPos(false);
   renderDots();
+  updateArrows();
 }
 
 /* ══════════════════════════
@@ -687,13 +713,23 @@ function setTrackPos(anim){
 }
 function goTo(i,anim=true){
   if(i<0||i>=articles.length) return;
-  curIdx=i; setTrackPos(anim); renderDots();
+  curIdx=i; setTrackPos(anim); renderDots(); updateArrows();
 }
 function renderDots(){
   const el=document.getElementById('dotsEl'); el.innerHTML='';
   if(articles.length<=1) return;
   articles.forEach((_,i)=>{ const d=document.createElement('div'); d.className='dot'+(i===curIdx?' active':''); d.addEventListener('click',()=>goTo(i)); el.appendChild(d); });
 }
+function updateArrows(){
+  const prev=document.getElementById('navPrev');
+  const next=document.getElementById('navNext');
+  if(!prev||!next) return;
+  prev.disabled = curIdx<=0;
+  next.disabled = curIdx>=articles.length-1;
+}
+
+document.getElementById('navPrev').addEventListener('click',()=>goTo(curIdx-1));
+document.getElementById('navNext').addEventListener('click',()=>goTo(curIdx+1));
 
 let swSX=0,swDX=0,swSY=0,swLocked=false;
 const sc=document.getElementById('swipeCont');
