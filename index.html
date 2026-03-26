@@ -413,10 +413,21 @@ footer{
         </div>
         <div class="cms-fld"><label>Description</label><textarea id="a-desc" rows="3"></textarea></div>
         <div class="cms-fld">
-          <label>Shirt Image</label>
+          <label>Shirt Image (Front)</label>
           <label class="up-btn">↑ Upload Shirt Image<input type="file" id="f-shirt" accept="image/*"></label>
           <div class="compress-note">Auto-compressed to ≤600KB, max 1400px on upload</div>
           <img class="prev-thumb" id="pv-shirt"/>
+        </div>
+        <div class="cms-fld">
+          <label>Shirt Image (Back) — shown after 180° rotation</label>
+          <label class="up-btn">↑ Upload Back of Shirt<input type="file" id="f-shirt-back" accept="image/*"></label>
+          <div class="compress-note">Auto-compressed to ≤600KB on upload</div>
+          <img class="prev-thumb" id="pv-shirt-back"/>
+        </div>
+        <div class="cms-fld">
+          <label>Hold Audio — loops while holding</label>
+          <label class="up-btn">↑ Upload Audio File (mp3/ogg)<input type="file" id="f-audio" accept="audio/*"></label>
+          <div class="compress-note" id="audio-note"></div>
         </div>
         <div class="cms-fld">
           <label>Hold Background Image</label>
@@ -509,7 +520,7 @@ function setPassword(pw){ localStorage.setItem(PW_KEY,pw); }
    STATE
 ══════════════════════════ */
 let globalData={}, articles=[], curIdx=0, cmsIdx=0;
-let pendingFiles={ logo:null, siteBg:null, shirtImg:null, holdBg:null };
+let pendingFiles={ logo:null, siteBg:null, shirtImg:null, shirtBack:null, holdBg:null, audio:null };
 
 /* ══════════════════════════
    LOAD — stale-while-revalidate
@@ -661,13 +672,27 @@ function renderTrack(){
 
     const wrap=document.createElement('div');
     wrap.className='shirt-wrap';
+
+    // Front image (or SVG fallback)
     if(art.shirt_img){
       const img=document.createElement('img');
-      img.className='shirt-img'; img.src=art.shirt_img; img.draggable=false;
-      img.loading= i===0 ? 'eager' : 'lazy';
-      img.decoding='async';
+      img.className='shirt-img shirt-front'; img.src=art.shirt_img; img.draggable=false;
+      img.loading= i===0 ? 'eager' : 'lazy'; img.decoding='async';
       wrap.appendChild(img);
-    } else wrap.insertAdjacentHTML('beforeend',svgShirt());
+    } else {
+      const svgWrap=document.createElement('div');
+      svgWrap.className='shirt-front'; svgWrap.style.cssText='width:100%;height:100%;position:absolute;inset:0';
+      svgWrap.innerHTML=svgShirt(); wrap.appendChild(svgWrap);
+    }
+
+    // Back image (hidden initially, shown after 180°)
+    if(art.shirt_back_img){
+      const imgBack=document.createElement('img');
+      imgBack.className='shirt-img shirt-back'; imgBack.src=art.shirt_back_img; imgBack.draggable=false;
+      imgBack.loading='lazy'; imgBack.decoding='async';
+      imgBack.style.cssText='position:absolute;inset:0;opacity:0;';
+      wrap.appendChild(imgBack);
+    }
 
     wrap.insertAdjacentHTML('beforeend',`
       <div class="ring"></div>
@@ -701,16 +726,48 @@ function renderTrack(){
 ══════════════════════════ */
 function attachShirt(wrap, art){
   let dragging=false, held=false, sx=0, deg=0, htimer=null;
-  const img=wrap.querySelector('.shirt-img');
-  const degEl=wrap.querySelector('.deg-el');
-  const hint=wrap.querySelector('.hold-hint');
+  let showingBack=false;
+  const front = wrap.querySelector('.shirt-front') || wrap.querySelector('.shirt-img');
+  const back  = wrap.querySelector('.shirt-back');
+  const degEl = wrap.querySelector('.deg-el');
+  const hint  = wrap.querySelector('.hold-hint');
+
+  // Audio setup
+  let audioEl=null;
+  if(art.audio_url){
+    audioEl=new Audio(art.audio_url);
+    audioEl.loop=true;
+    audioEl.preload='none';
+  }
 
   function dismissHint(){ if(hint) hint.classList.add('hidden'); }
 
+  function showFront(){
+    if(!showingBack) return;
+    showingBack=false;
+    if(front) front.style.opacity='1';
+    if(back)  back.style.opacity='0';
+  }
+  function showBack(){
+    if(showingBack || !back) return;
+    showingBack=true;
+    if(front) front.style.opacity='0';
+    if(back)  back.style.opacity='1';
+  }
+
   function applyRot(d){
-    const n=((d%360)+360)%360, rad=(n*Math.PI)/180;
+    const n=((d%360)+360)%360;
+    const rad=(n*Math.PI)/180;
     const cx=Math.cos(rad), ab=Math.abs(cx);
-    img.style.transform=`scaleX(${cx<0?-ab:ab}) skewY(${Math.sin(rad)*4}deg)`;
+    // Determine which face to show based on current quadrant
+    // 90°–270° = back face visible, otherwise front
+    const inBack = n>90 && n<270;
+    if(inBack) showBack(); else showFront();
+    // Apply transform to whichever face is currently shown
+    const activeEl = showingBack ? back : front;
+    if(activeEl){
+      activeEl.style.transform=`scaleX(${cx<0?-ab:ab}) skewY(${Math.sin(rad)*4}deg)`;
+    }
     degEl.textContent=Math.round(n)+'°';
   }
 
@@ -726,11 +783,15 @@ function attachShirt(wrap, art){
       holdBgLayer.style.background=art.hold_color;
       holdBgLayer.classList.add('on');
     }
+    // Start audio
+    if(audioEl){ audioEl.currentTime=0; audioEl.play().catch(()=>{}); }
     cur.classList.add('press');
   }
   function endHold(){
     held=false; wrap.classList.remove('held');
     holdBgLayer.classList.remove('on');
+    // Stop audio
+    if(audioEl){ audioEl.pause(); audioEl.currentTime=0; }
     cur.classList.remove('press');
   }
   function beginDrag(x){
@@ -807,7 +868,7 @@ document.getElementById('cms-x').addEventListener('click',closeCMS);
 document.getElementById('cms-backdrop').addEventListener('click',closeCMS);
 
 function openCMS(){
-  pendingFiles={logo:null,siteBg:null,shirtImg:null,holdBg:null};
+  pendingFiles={logo:null,siteBg:null,shirtImg:null,shirtBack:null,holdBg:null,audio:null};
   cmsOv.classList.add('open');
   document.getElementById('g-ig-url').value=globalData.ig_url||'';
   document.getElementById('g-ticker').value=globalData.ticker||'';
@@ -825,7 +886,7 @@ function renderTabs(){
   articles.forEach((art,i)=>{
     const b=document.createElement('button'); b.className='art-tab'+(i===cmsIdx?' active':'');
     b.textContent=`#${i+1} ${art.name||'Untitled'}`;
-    b.addEventListener('click',()=>{ cmsIdx=i; pendingFiles.shirtImg=null; pendingFiles.holdBg=null; renderTabs(); loadEditor(i); });
+    b.addEventListener('click',()=>{ cmsIdx=i; pendingFiles.shirtImg=null; pendingFiles.shirtBack=null; pendingFiles.holdBg=null; pendingFiles.audio=null; renderTabs(); loadEditor(i); });
     el.appendChild(b);
   });
 }
@@ -839,8 +900,12 @@ function loadEditor(i){
   document.getElementById('a-avail').value=a.avail_status||'Available Now';
   const ps=document.getElementById('pv-shirt');
   a.shirt_img?(ps.src=a.shirt_img,ps.classList.add('show')):(ps.src='',ps.classList.remove('show'));
+  const psb=document.getElementById('pv-shirt-back');
+  a.shirt_back_img?(psb.src=a.shirt_back_img,psb.classList.add('show')):(psb.src='',psb.classList.remove('show'));
   const ph=document.getElementById('pv-hold-bg');
   a.hold_bg?(ph.src=a.hold_bg,ph.classList.add('show')):(ph.src='',ph.classList.remove('show'));
+  const an=document.getElementById('audio-note');
+  an.textContent=a.audio_url?'✓ Audio file uploaded':'No audio set';
 }
 
 /* preview + compress on select */
@@ -855,7 +920,13 @@ async function handleFileInput(file, pendingKey, previewId, opts){
 
 document.getElementById('f-site-bg').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleFileInput(f,'siteBg','pv-site-bg',{maxW:2400,maxH:1600,quality:0.80,maxKB:800}); });
 document.getElementById('f-shirt').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleFileInput(f,'shirtImg','pv-shirt',{maxW:1400,maxH:1800,quality:0.84,maxKB:600}); });
+document.getElementById('f-shirt-back').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleFileInput(f,'shirtBack','pv-shirt-back',{maxW:1400,maxH:1800,quality:0.84,maxKB:600}); });
 document.getElementById('f-hold-bg').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleFileInput(f,'holdBg','pv-hold-bg',{maxW:2400,maxH:1600,quality:0.80,maxKB:800}); });
+document.getElementById('f-audio').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  pendingFiles.audio=f;
+  document.getElementById('audio-note').textContent=`✓ ${f.name} (${(f.size/1024).toFixed(0)}KB) — will upload on save`;
+});
 
 document.getElementById('remove-logo-btn').addEventListener('click',()=>{ pendingFiles.logo='__remove__'; const p=document.getElementById('pv-logo'); p.src=''; p.classList.remove('show'); });
 document.getElementById('remove-site-bg-btn').addEventListener('click',()=>{ pendingFiles.siteBg='__remove__'; const p=document.getElementById('pv-site-bg'); p.src=''; p.classList.remove('show'); });
@@ -895,7 +966,8 @@ document.getElementById('saveBtn').addEventListener('click',async()=>{
   try{
     const art=articles[cmsIdx];
     let logoUrl=globalData.logo_img||null, siteBgUrl=globalData.site_bg||null;
-    let shirtUrl=art.shirt_img||null, holdBgUrl=art.hold_bg||null;
+    let shirtUrl=art.shirt_img||null, shirtBackUrl=art.shirt_back_img||null;
+    let holdBgUrl=art.hold_bg||null, audioUrl=art.audio_url||null;
 
     const ext=f=>f.name.split('.').pop();
     if(pendingFiles.logo==='__remove__') logoUrl=null;
@@ -903,17 +975,19 @@ document.getElementById('saveBtn').addEventListener('click',async()=>{
     if(pendingFiles.siteBg==='__remove__') siteBgUrl=null;
     else if(pendingFiles.siteBg) siteBgUrl=await uploadFile(pendingFiles.siteBg,`sitebg_${Date.now()}.${ext(pendingFiles.siteBg)}`);
     if(pendingFiles.shirtImg) shirtUrl=await uploadFile(pendingFiles.shirtImg,`shirt_${art.id}_${Date.now()}.${ext(pendingFiles.shirtImg)}`);
+    if(pendingFiles.shirtBack) shirtBackUrl=await uploadFile(pendingFiles.shirtBack,`shirtback_${art.id}_${Date.now()}.${ext(pendingFiles.shirtBack)}`);
     if(pendingFiles.holdBg) holdBgUrl=await uploadFile(pendingFiles.holdBg,`holdbg_${art.id}_${Date.now()}.${ext(pendingFiles.holdBg)}`);
+    if(pendingFiles.audio) audioUrl=await uploadFile(pendingFiles.audio,`audio_${art.id}_${Date.now()}.${ext(pendingFiles.audio)}`);
 
     const ng={ ticker:document.getElementById('g-ticker').value, ig_url:document.getElementById('g-ig-url').value, logo_img:logoUrl, site_bg:siteBgUrl };
     await sbPatch('santai_global','id=eq.1',ng);
     globalData={...globalData,...ng};
 
-    const na={ name:document.getElementById('a-name').value, sub:document.getElementById('a-sub').value, description:document.getElementById('a-desc').value, hold_color:document.getElementById('a-hold-color').value, sizes:document.getElementById('a-sizes').value, shirt_img:shirtUrl, hold_bg:holdBgUrl, avail_status:document.getElementById('a-avail').value };
+    const na={ name:document.getElementById('a-name').value, sub:document.getElementById('a-sub').value, description:document.getElementById('a-desc').value, hold_color:document.getElementById('a-hold-color').value, sizes:document.getElementById('a-sizes').value, shirt_img:shirtUrl, shirt_back_img:shirtBackUrl, hold_bg:holdBgUrl, audio_url:audioUrl, avail_status:document.getElementById('a-avail').value };
     await sbPatch('santai_articles',`id=eq.${art.id}`,na);
     articles[cmsIdx]={...art,...na};
 
-    pendingFiles={logo:null,siteBg:null,shirtImg:null,holdBg:null};
+    pendingFiles={logo:null,siteBg:null,shirtImg:null,shirtBack:null,holdBg:null,audio:null};
     localStorage.setItem(CACHE_KEY, JSON.stringify({g:globalData, a:articles}));
     applyGlobal(); renderTrack(); renderTabs(); applyArticleStatus();
     btn.innerHTML='SAVE ALL CHANGES'; btn.disabled=false;
