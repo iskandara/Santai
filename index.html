@@ -149,15 +149,32 @@ footer{
   user-select:none;
 }
 .shirt-img{
+  position:absolute;inset:0;
   width:100%;height:100%;
   object-fit:contain;display:block;
   pointer-events:none;
   transition:none;
   filter:none;
   will-change:transform;
-  opacity:1 !important;
 }
-.shirt-wrap.held .shirt-img{
+.shirt-front{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:contain;display:block;
+  pointer-events:none;
+  will-change:transform;
+}
+.shirt-back{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:contain;display:block;
+  pointer-events:none;
+  opacity:0;
+  will-change:transform;
+}
+.shirt-wrap.held .shirt-img,
+.shirt-wrap.held .shirt-front,
+.shirt-wrap.held .shirt-back{
   filter:brightness(.9);
 }
 .ring{display:none}
@@ -261,6 +278,13 @@ footer{
 .art-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .art-tab{font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:5px 12px;border:1px solid rgba(255,255,255,.15);background:none;color:#888;cursor:pointer;transition:all .2s}
 .art-tab.active{background:#f5f5f0;color:#0a0a0a;border-color:#f5f5f0}
+.art-sort-row{display:flex;align-items:center;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+.art-sort-item{display:flex;align-items:center;gap:0;border:1px solid rgba(255,255,255,.15);overflow:hidden}
+.art-sort-label{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:#888;padding:5px 10px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.art-sort-label.active{background:#f5f5f0;color:#0a0a0a}
+.sort-btn{background:none;border:none;border-left:1px solid rgba(255,255,255,.15);color:#888;padding:5px 7px;cursor:pointer;font-size:10px;line-height:1;transition:color .2s}
+.sort-btn:hover{color:#f5f5f0}
+.sort-btn:disabled{opacity:.2;cursor:not-allowed}
 .add-art-btn{width:100%;padding:9px;background:none;color:#888;border:1px dashed rgba(255,255,255,.15);font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-bottom:16px}
 .add-art-btn:hover{color:#f5f5f0;border-color:rgba(255,255,255,.4)}
 .save-btn{width:100%;padding:13px;background:#f5f5f0;color:#0a0a0a;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.3em;cursor:pointer;transition:opacity .2s;margin-top:6px}
@@ -397,8 +421,8 @@ footer{
     </div>
 
     <div class="cms-sec">
-      <div class="cms-sec-lbl">Articles</div>
-      <div class="art-tabs" id="artTabs"></div>
+      <div class="cms-sec-lbl">Articles — drag to reorder</div>
+      <div class="art-sort-row" id="artTabs"></div>
       <button class="add-art-btn" id="addArtBtn">+ Add Article</button>
       <div id="artEditor">
         <div class="cms-fld"><label>Shirt Name</label><input type="text" id="a-name"/></div>
@@ -742,32 +766,25 @@ function attachShirt(wrap, art){
 
   function dismissHint(){ if(hint) hint.classList.add('hidden'); }
 
-  function showFront(){
-    if(!showingBack) return;
-    showingBack=false;
-    if(front) front.style.opacity='1';
-    if(back)  back.style.opacity='0';
-  }
-  function showBack(){
-    if(showingBack || !back) return;
-    showingBack=true;
-    if(front) front.style.opacity='0';
-    if(back)  back.style.opacity='1';
-  }
-
   function applyRot(d){
     const n=((d%360)+360)%360;
     const rad=(n*Math.PI)/180;
     const cx=Math.cos(rad), ab=Math.abs(cx);
-    // Determine which face to show based on current quadrant
-    // 90°–270° = back face visible, otherwise front
+    // At exactly the zero-crossing (scaleX≈0) swap faces
     const inBack = n>90 && n<270;
-    if(inBack) showBack(); else showFront();
-    // Apply transform to whichever face is currently shown
-    const activeEl = showingBack ? back : front;
-    if(activeEl){
-      activeEl.style.transform=`scaleX(${cx<0?-ab:ab}) skewY(${Math.sin(rad)*4}deg)`;
+    if(inBack && !showingBack){
+      showingBack=true;
+      if(front){ front.style.opacity='0'; front.style.transform=''; }
+      if(back)  back.style.opacity='1';
+    } else if(!inBack && showingBack){
+      showingBack=false;
+      if(back){ back.style.opacity='0'; back.style.transform=''; }
+      if(front) front.style.opacity='1';
     }
+    // Mirror the scaleX for the back face (it's the reverse side)
+    const transform=`scaleX(${cx<0?-ab:ab}) skewY(${Math.sin(rad)*4}deg)`;
+    if(showingBack && back)   back.style.transform=transform;
+    else if(front)            front.style.transform=transform;
     degEl.textContent=Math.round(n)+'°';
   }
 
@@ -884,11 +901,45 @@ function closeCMS(){ cmsOv.classList.remove('open'); window.location.hash=''; }
 function renderTabs(){
   const el=document.getElementById('artTabs'); el.innerHTML='';
   articles.forEach((art,i)=>{
-    const b=document.createElement('button'); b.className='art-tab'+(i===cmsIdx?' active':'');
-    b.textContent=`#${i+1} ${art.name||'Untitled'}`;
-    b.addEventListener('click',()=>{ cmsIdx=i; pendingFiles.shirtImg=null; pendingFiles.shirtBack=null; pendingFiles.holdBg=null; pendingFiles.audio=null; renderTabs(); loadEditor(i); });
-    el.appendChild(b);
+    const item=document.createElement('div');
+    item.className='art-sort-item';
+
+    const lbl=document.createElement('div');
+    lbl.className='art-sort-label'+(i===cmsIdx?' active':'');
+    lbl.textContent=`#${i+1} ${art.name||'Untitled'}`;
+    lbl.addEventListener('click',()=>{ cmsIdx=i; pendingFiles.shirtImg=null; pendingFiles.shirtBack=null; pendingFiles.holdBg=null; pendingFiles.audio=null; renderTabs(); loadEditor(i); });
+
+    const btnUp=document.createElement('button');
+    btnUp.className='sort-btn'; btnUp.textContent='↑'; btnUp.disabled=i===0;
+    btnUp.title='Move up';
+    btnUp.addEventListener('click',async(e)=>{ e.stopPropagation(); await moveArticle(i,-1); });
+
+    const btnDn=document.createElement('button');
+    btnDn.className='sort-btn'; btnDn.textContent='↓'; btnDn.disabled=i===articles.length-1;
+    btnDn.title='Move down';
+    btnDn.addEventListener('click',async(e)=>{ e.stopPropagation(); await moveArticle(i,1); });
+
+    item.appendChild(lbl); item.appendChild(btnUp); item.appendChild(btnDn);
+    el.appendChild(item);
   });
+}
+
+async function moveArticle(idx, dir){
+  const swapIdx=idx+dir;
+  if(swapIdx<0||swapIdx>=articles.length) return;
+  // Swap in local array
+  [articles[idx],articles[swapIdx]]=[articles[swapIdx],articles[idx]];
+  // Update sort_order on both
+  articles.forEach((a,i)=>a.sort_order=i);
+  // Adjust cmsIdx to follow the moved article
+  if(cmsIdx===idx) cmsIdx=swapIdx;
+  else if(cmsIdx===swapIdx) cmsIdx=idx;
+  renderTabs(); loadEditor(cmsIdx); renderTrack();
+  // Persist to Supabase
+  try{
+    await Promise.all(articles.map((a,i)=>sbPatch('santai_articles',`id=eq.${a.id}`,{sort_order:i})));
+    localStorage.setItem(CACHE_KEY,JSON.stringify({g:globalData,a:articles}));
+  }catch(e){ console.warn('Sort save error:',e); }
 }
 function loadEditor(i){
   const a=articles[i]; if(!a) return;
