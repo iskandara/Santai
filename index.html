@@ -197,40 +197,6 @@ footer{
 }
 .shirt-wrap.dragging .art-counter{opacity:0}
 
-/* ── SIZE CHART — desktop table ── */
-.sz{width:100%;border-collapse:collapse;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,245,240,.7)}
-.sz th{border-bottom:1px solid rgba(245,245,240,.18);padding:5px 0;text-align:left;font-weight:normal;color:rgba(245,245,240,.38)}
-.sz td{padding:5px 0;border-bottom:1px solid rgba(245,245,240,.07)}
-.sz tr:last-child td{border-bottom:none}
-.sz-cards{display:none}
-
-/* ── SIZE CHART — mobile stacked cards ── */
-@media(max-width:540px){
-  .sz{display:none}
-  .sz-cards{
-    display:flex;flex-wrap:wrap;gap:6px;width:100%;
-  }
-  .sz-card{
-    flex:1 1 calc(50% - 6px);
-    border:1px solid rgba(245,245,240,.15);
-    padding:8px 10px;
-    min-width:0;
-  }
-  .sz-card-size{
-    font-family:'Bebas Neue',sans-serif;
-    font-size:16px;letter-spacing:.2em;
-    color:rgba(245,245,240,.9);
-    line-height:1;margin-bottom:5px;
-  }
-  .sz-card-row{
-    font-size:8px;letter-spacing:.15em;text-transform:uppercase;
-    color:rgba(245,245,240,.45);
-    display:flex;justify-content:space-between;
-    padding:2px 0;
-  }
-  .sz-card-row span:last-child{color:rgba(245,245,240,.75)}
-}
-
 /* ── DETAIL PANEL (overlay on shirt, shown on hold) ── */
 .detail-panel{
   position:absolute;inset:0;
@@ -673,22 +639,8 @@ function svgShirt(){
 }
 function szTable(s){
   if(!s||!s.trim()) return '';
-  const rows=s.trim().split('\n').filter(Boolean).map(l=>{
-    const[size,chest,length,shoulder]=l.split(',').map(x=>x.trim());
-    return {size,chest,length,shoulder};
-  });
-  // Desktop table
-  const tableRows=rows.map(r=>`<tr><td>${r.size||''}</td><td>${r.chest||''} cm</td><td>${r.length||''} cm</td><td>${r.shoulder||''} cm</td></tr>`).join('');
-  const table=`<table class="sz"><thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Shoulder</th></tr></thead><tbody>${tableRows}</tbody></table>`;
-  // Mobile stacked cards
-  const cards=rows.map(r=>`
-    <div class="sz-card">
-      <div class="sz-card-size">${r.size||''}</div>
-      <div class="sz-card-row"><span>Chest</span><span>${r.chest||''} cm</span></div>
-      <div class="sz-card-row"><span>Length</span><span>${r.length||''} cm</span></div>
-      <div class="sz-card-row"><span>Shoulder</span><span>${r.shoulder||''} cm</span></div>
-    </div>`).join('');
-  return table+`<div class="sz-cards">${cards}</div>`;
+  const rows=s.trim().split('\n').filter(Boolean).map(l=>{ const[a,b,c,d]=l.split(',').map(x=>x.trim()); return `<tr><td>${a}</td><td>${b} cm</td><td>${c} cm</td><td>${d} cm</td></tr>`; }).join('');
+  return `<table class="sz"><thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Shoulder</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 /* ══════════════════════════
