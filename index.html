@@ -453,6 +453,11 @@ footer{
       <div class="cms-fld"><label>Instagram URL</label><input type="text" id="g-ig-url" placeholder="https://instagram.com/yourbrand"/></div>
       <div class="cms-fld"><label>Running Text (separate with |)</label><textarea id="g-ticker" rows="3"></textarea></div>
       <div class="cms-fld">
+        <label>Size Chart (S,chest,length,shoulder — one per line)</label>
+        <textarea id="g-size-chart" rows="6" placeholder="S,104,72,48&#10;M,110,75,51&#10;L,116,78,54&#10;XL,122,81,57"></textarea>
+        <div class="compress-note">This is the global size chart shown at /sizechart</div>
+      </div>
+      <div class="cms-fld">
         <label>Site Background Image</label>
         <label class="up-btn">↑ Upload Site Background<input type="file" id="f-site-bg" accept="image/*"></label>
         <div class="compress-note">Auto-compressed to ≤800KB on upload</div>
@@ -951,6 +956,7 @@ function openCMS(){
   cmsOv.classList.add('open');
   document.getElementById('g-ig-url').value=globalData.ig_url||'';
   document.getElementById('g-ticker').value=globalData.ticker||'';
+  document.getElementById('g-size-chart').value=globalData.size_chart||'';
   document.getElementById('g-new-pw').value='';
   const psb=document.getElementById('pv-site-bg');
   globalData.site_bg?(psb.src=globalData.site_bg,psb.classList.add('show')):(psb.src='',psb.classList.remove('show'));
@@ -1092,7 +1098,7 @@ document.getElementById('saveBtn').addEventListener('click',async()=>{
     if(pendingFiles.holdBg) holdBgUrl=await uploadFile(pendingFiles.holdBg,`holdbg_${art.id}_${Date.now()}.${ext(pendingFiles.holdBg)}`);
     if(pendingFiles.audio) audioUrl=await uploadFile(pendingFiles.audio,`audio_${art.id}_${Date.now()}.${ext(pendingFiles.audio)}`);
 
-    const ng={ ticker:document.getElementById('g-ticker').value, ig_url:document.getElementById('g-ig-url').value, logo_img:logoUrl, site_bg:siteBgUrl };
+    const ng={ ticker:document.getElementById('g-ticker').value, ig_url:document.getElementById('g-ig-url').value, size_chart:document.getElementById('g-size-chart').value, logo_img:logoUrl, site_bg:siteBgUrl };
     await sbPatch('santai_global','id=eq.1',ng);
     globalData={...globalData,...ng};
 
