@@ -43,92 +43,59 @@ header{
 .logo-img{max-height:32px;max-width:140px;object-fit:contain;display:none}
 .logo-img.show{display:block}
 
+/* ── MAIN WRAP ── */
+.wrap{
+  max-width:680px;
+  margin:0 auto;
+  padding:0 24px 80px;
+}
+
 /* ── PAGE TITLE ── */
 .page-title{
   text-align:center;
-  padding:56px 32px 40px;
+  padding:56px 0 40px;
 }
 .page-title h1{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(32px,6vw,56px);
+  font-size:clamp(36px,7vw,64px);
   letter-spacing:.3em;
   line-height:1;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 .page-title p{
-  font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--mid);
-}
-
-/* ── MEASURING GUIDE ── */
-.guide{
-  max-width:640px;margin:0 auto 56px;
-  padding:0 32px;
-}
-.guide-title{
-  font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--mid);
-  border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:20px;
-}
-.guide-items{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.guide-item{}
-.guide-item strong{
-  display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--fg);margin-bottom:4px;font-weight:normal;
-}
-.guide-item p{
-  font-family:'Cormorant Garamond',serif;
-  font-size:13px;line-height:1.6;color:var(--mid);
-}
-@media(max-width:480px){.guide-items{grid-template-columns:1fr}}
-
-/* ── ARTICLES ── */
-.articles{
-  max-width:800px;margin:0 auto;
-  padding:0 24px 80px;
-  display:flex;flex-direction:column;gap:64px;
-}
-
-.article-block{}
-.article-name{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(24px,5vw,40px);
-  letter-spacing:.28em;
-  line-height:1;
-  margin-bottom:4px;
-}
-.article-sub{
   font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mid);
-  margin-bottom:28px;
 }
 
-/* ── SIZE TABLE ── */
-.sz-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+/* ── SIZE TABLE — desktop ── */
+.sz-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:12px}
 table.sz{
   width:100%;border-collapse:collapse;
-  font-size:11px;letter-spacing:.15em;text-transform:uppercase;
 }
 table.sz th{
   border-bottom:1px solid var(--border);
   padding:10px 0;text-align:left;
   font-weight:normal;color:var(--mid);
-  font-size:9px;letter-spacing:.2em;
+  font-size:9px;letter-spacing:.22em;text-transform:uppercase;
   white-space:nowrap;
 }
 table.sz td{
-  padding:12px 0;
+  padding:16px 0;
   border-bottom:1px solid rgba(0,0,0,.06);
-  font-family:'Cormorant Garamond',serif;
-  font-size:15px;
-  letter-spacing:.05em;
 }
 table.sz tr:last-child td{border-bottom:none}
 table.sz td:first-child{
   font-family:'Bebas Neue',sans-serif;
-  font-size:20px;letter-spacing:.2em;
+  font-size:26px;letter-spacing:.2em;width:80px;
 }
-table.sz td:not(:first-child){padding-right:16px}
+table.sz td:not(:first-child){
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;letter-spacing:.04em;
+  padding-right:20px;
+}
 
-/* ── MOBILE CARDS ── */
+/* ── SIZE CARDS — mobile ── */
 .sz-cards{display:none}
+
 @media(max-width:500px){
   table.sz{display:none}
   .sz-cards{
@@ -138,36 +105,61 @@ table.sz td:not(:first-child){padding-right:16px}
     background:var(--border);
     border:1px solid var(--border);
     overflow:hidden;
+    margin-bottom:12px;
   }
   .sz-card{
     background:var(--bg);
-    padding:16px 14px;
+    padding:18px 14px;
   }
   .sz-card-size{
     font-family:'Bebas Neue',sans-serif;
-    font-size:28px;letter-spacing:.2em;
+    font-size:32px;letter-spacing:.2em;
     color:var(--fg);line-height:1;
-    margin-bottom:10px;
+    margin-bottom:12px;
   }
   .sz-card-row{
     display:flex;justify-content:space-between;align-items:baseline;
-    padding:4px 0;
+    padding:5px 0;
     border-bottom:1px solid var(--border);
   }
   .sz-card-row:last-child{border-bottom:none}
-  .sz-card-label{
-    font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--mid);
-  }
-  .sz-card-val{
-    font-family:'Cormorant Garamond',serif;
-    font-size:14px;color:var(--fg);
-  }
+  .sz-card-label{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--mid)}
+  .sz-card-val{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--fg)}
 }
 
 /* ── UNIT NOTE ── */
 .unit-note{
   font-size:9px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--mid);margin-top:16px;
+  color:var(--mid);margin-bottom:56px;
+}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin-bottom:48px}
+
+/* ── HOW TO MEASURE ── */
+.section-label{
+  font-size:9px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--mid);margin-bottom:24px;
+}
+.guide-items{
+  display:grid;grid-template-columns:1fr 1fr;gap:24px 32px;
+  margin-bottom:56px;
+}
+@media(max-width:480px){.guide-items{grid-template-columns:1fr;gap:20px}}
+
+.guide-item strong{
+  display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--fg);margin-bottom:6px;font-weight:normal;
+}
+.guide-item p{
+  font-family:'Cormorant Garamond',serif;
+  font-size:14px;line-height:1.7;color:var(--mid);
+}
+
+/* ── EMPTY STATE ── */
+.empty{
+  text-align:center;padding:60px 0;
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mid);
 }
 
 /* ── FOOTER ── */
@@ -190,8 +182,8 @@ footer{
 .loading-bar-wrap{width:100px;height:1px;background:var(--border)}
 .loading-bar{height:1px;background:var(--fg);width:0%;transition:width .4s ease}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.anim{animation:fadeUp .7s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .65s ease both}
 </style>
 </head>
 <body>
@@ -205,7 +197,7 @@ footer{
 </div>
 
 <header>
-  <a class="back-link" href="index.html">
+  <a class="back-link" href="index.html" cursor="none">
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
     Back
   </a>
@@ -214,44 +206,53 @@ footer{
 </header>
 
 <main>
-  <div class="page-title anim">
-    <h1>Size Chart</h1>
-    <p>All measurements in centimetres</p>
-  </div>
+  <div class="wrap">
 
-  <div class="guide anim" style="animation-delay:.1s">
-    <div class="guide-title">How to Measure</div>
-    <div class="guide-items">
-      <div class="guide-item">
-        <strong>Chest</strong>
-        <p>Measure around the fullest part of your chest, keeping the tape horizontal.</p>
-      </div>
-      <div class="guide-item">
-        <strong>Length</strong>
-        <p>Measure from the highest point of the shoulder down to the hem.</p>
-      </div>
-      <div class="guide-item">
-        <strong>Shoulder</strong>
-        <p>Measure from shoulder seam to shoulder seam across the back.</p>
-      </div>
-      <div class="guide-item">
-        <strong>Fit Note</strong>
-        <p>SANTAI pieces are cut oversized. When in doubt, size down.</p>
+    <!-- TITLE -->
+    <div class="page-title anim">
+      <h1>Size Chart</h1>
+      <p>All measurements in centimetres</p>
+    </div>
+
+    <!-- SIZE CHART — rendered by JS -->
+    <div id="sz-container" class="anim" style="animation-delay:.1s"></div>
+
+    <!-- DIVIDER -->
+    <div class="divider anim" style="animation-delay:.18s"></div>
+
+    <!-- HOW TO MEASURE -->
+    <div class="anim" style="animation-delay:.22s">
+      <div class="section-label">How to Measure</div>
+      <div class="guide-items">
+        <div class="guide-item">
+          <strong>Chest</strong>
+          <p>Measure around the fullest part of your chest, keeping the tape horizontal under your arms.</p>
+        </div>
+        <div class="guide-item">
+          <strong>Length</strong>
+          <p>Measure from the highest point of the shoulder straight down to the hem.</p>
+        </div>
+        <div class="guide-item">
+          <strong>Shoulder</strong>
+          <p>Measure from shoulder seam to shoulder seam across the back of the garment.</p>
+        </div>
+        <div class="guide-item">
+          <strong>Fit Note</strong>
+          <p>SANTAI pieces are cut oversized. When in doubt, size down for a cleaner silhouette.</p>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="articles" id="articles"></div>
+  </div>
 </main>
 
-<footer id="footerTxt">SANTAI — All measurements in cm</footer>
+<footer>SANTAI — Size Chart — All measurements in cm</footer>
 
 <script>
 const SB_URL='https://iddwjrusnkvblezkrqjz.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZHdqcnVzbmt2YmxlemtycWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NDg2NTYsImV4cCI6MjA4OTQyNDY1Nn0.Z_5QInMfYMbOY8HRz9omb-3LBKS4bU3V6q_-ESbgQW4';
 const H={'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`};
 
-// Cursor
 const cur=document.getElementById('cursor');
 document.addEventListener('mousemove',e=>{ cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
 
@@ -269,20 +270,20 @@ function parseSizes(s){
   });
 }
 
-function renderSzTable(sizes){
+function renderTable(sizes){
   const rows=sizes.map(r=>`<tr>
     <td>${r.size||''}</td>
     <td>${r.chest||''} cm</td>
     <td>${r.length||''} cm</td>
     <td>${r.shoulder||''} cm</td>
   </tr>`).join('');
-  return `<table class="sz">
+  return `<div class="sz-wrap"><table class="sz">
     <thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Shoulder</th></tr></thead>
     <tbody>${rows}</tbody>
-  </table>`;
+  </table></div>`;
 }
 
-function renderSzCards(sizes){
+function renderCards(sizes){
   const cards=sizes.map(r=>`
     <div class="sz-card">
       <div class="sz-card-size">${r.size||''}</div>
@@ -296,42 +297,31 @@ function renderSzCards(sizes){
 async function load(){
   setBar(20);
   try{
-    const [gRes,aRes]=await Promise.all([
-      fetch(`${SB_URL}/rest/v1/santai_global?id=eq.1`,{headers:H}),
-      fetch(`${SB_URL}/rest/v1/santai_articles?order=sort_order.asc`,{headers:H})
-    ]);
-    const [globals,arts]=await Promise.all([gRes.json(),aRes.json()]);
-    const g=globals[0]||{};
+    const res=await fetch(`${SB_URL}/rest/v1/santai_global?id=eq.1`,{headers:H});
+    const data=await res.json();
+    const g=data[0]||{};
     setBar(80);
 
     // Apply logo
     const li=document.getElementById('logoImg'), lt=document.getElementById('logoText');
     if(g.logo_img){ li.src=g.logo_img; li.classList.add('show'); lt.style.display='none'; }
 
-    // Render articles
-    const container=document.getElementById('articles');
-    arts.forEach((art,i)=>{
-      if(!art.sizes||!art.sizes.trim()) return;
-      const sizes=parseSizes(art.sizes);
-      if(!sizes.length) return;
-      const block=document.createElement('div');
-      block.className='article-block anim';
-      block.style.animationDelay=(i*0.08+0.15)+'s';
-      block.innerHTML=`
-        <div class="article-name">${art.name||'Untitled'}</div>
-        <div class="article-sub">${art.sub||''}</div>
-        <div class="sz-wrap">
-          ${renderSzTable(sizes)}
-          ${renderSzCards(sizes)}
-        </div>
-        <div class="unit-note">All measurements in centimetres (cm)</div>`;
-      container.appendChild(block);
-    });
+    // Render global size chart
+    const container=document.getElementById('sz-container');
+    const sizes=parseSizes(g.size_chart||'');
+    if(sizes.length){
+      container.innerHTML=
+        renderTable(sizes)+
+        renderCards(sizes)+
+        `<div class="unit-note">All measurements in centimetres (cm)</div>`;
+    } else {
+      container.innerHTML=`<div class="empty">Size chart coming soon.</div>`;
+    }
 
     hideLoading();
   }catch(e){
     console.error(e);
-    document.getElementById('articles').innerHTML=`<p style="color:var(--mid);font-size:11px;letter-spacing:.15em;text-transform:uppercase">Could not load size chart. Please try again.</p>`;
+    document.getElementById('sz-container').innerHTML=`<div class="empty">Could not load. Please try again.</div>`;
     hideLoading();
   }
 }
