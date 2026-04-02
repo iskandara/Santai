@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SANTAI — Size Chart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://iddwjrusnkvblezkrqjz.supabase.co">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Bebas+Neue&family=Courier+Prime&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Bebas+Neue&family=Courier+Prime&display=swap" rel="stylesheet"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f5f0;--fg:#0a0a0a;--mid:#888;--border:rgba(0,0,0,0.12)}
+html{background:var(--bg);color:var(--fg);font-family:'Courier Prime',monospace}
+body{min-height:100vh;overflow-x:hidden;cursor:none}
+@media(pointer:coarse){body{cursor:auto}}
+
+#cursor{position:fixed;top:0;left:0;z-index:9999;width:10px;height:10px;background:var(--fg);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+@media(pointer:coarse){#cursor{display:none}}
+
+.grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.032;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px}
+
+/* ── HEADER ── */
+header{
+  position:sticky;top:0;z-index:100;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 32px;
+  position:relative;
+}
+.back-link{
+  position:absolute;left:32px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;gap:8px;
+  font-size:8px;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--fg);opacity:.4;text-decoration:none;
+  transition:opacity .2s;cursor:none;
+}
+.back-link:hover{opacity:1}
+.back-link svg{display:block}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.38em}
+.logo-img{max-height:32px;max-width:140px;object-fit:contain;display:none}
+.logo-img.show{display:block}
+
+/* ── PAGE TITLE ── */
+.page-title{
+  text-align:center;
+  padding:56px 32px 40px;
+}
+.page-title h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(32px,6vw,56px);
+  letter-spacing:.3em;
+  line-height:1;
+  margin-bottom:12px;
+}
+.page-title p{
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--mid);
+}
+
+/* ── MEASURING GUIDE ── */
+.guide{
+  max-width:640px;margin:0 auto 56px;
+  padding:0 32px;
+}
+.guide-title{
+  font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--mid);
+  border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:20px;
+}
+.guide-items{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.guide-item{}
+.guide-item strong{
+  display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--fg);margin-bottom:4px;font-weight:normal;
+}
+.guide-item p{
+  font-family:'Cormorant Garamond',serif;
+  font-size:13px;line-height:1.6;color:var(--mid);
+}
+@media(max-width:480px){.guide-items{grid-template-columns:1fr}}
+
+/* ── ARTICLES ── */
+.articles{
+  max-width:800px;margin:0 auto;
+  padding:0 24px 80px;
+  display:flex;flex-direction:column;gap:64px;
+}
+
+.article-block{}
+.article-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(24px,5vw,40px);
+  letter-spacing:.28em;
+  line-height:1;
+  margin-bottom:4px;
+}
+.article-sub{
+  font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mid);
+  margin-bottom:28px;
+}
+
+/* ── SIZE TABLE ── */
+.sz-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table.sz{
+  width:100%;border-collapse:collapse;
+  font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+}
+table.sz th{
+  border-bottom:1px solid var(--border);
+  padding:10px 0;text-align:left;
+  font-weight:normal;color:var(--mid);
+  font-size:9px;letter-spacing:.2em;
+  white-space:nowrap;
+}
+table.sz td{
+  padding:12px 0;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  font-family:'Cormorant Garamond',serif;
+  font-size:15px;
+  letter-spacing:.05em;
+}
+table.sz tr:last-child td{border-bottom:none}
+table.sz td:first-child{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;letter-spacing:.2em;
+}
+table.sz td:not(:first-child){padding-right:16px}
+
+/* ── MOBILE CARDS ── */
+.sz-cards{display:none}
+@media(max-width:500px){
+  table.sz{display:none}
+  .sz-cards{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+    overflow:hidden;
+  }
+  .sz-card{
+    background:var(--bg);
+    padding:16px 14px;
+  }
+  .sz-card-size{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:28px;letter-spacing:.2em;
+    color:var(--fg);line-height:1;
+    margin-bottom:10px;
+  }
+  .sz-card-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:4px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .sz-card-row:last-child{border-bottom:none}
+  .sz-card-label{
+    font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--mid);
+  }
+  .sz-card-val{
+    font-family:'Cormorant Garamond',serif;
+    font-size:14px;color:var(--fg);
+  }
+}
+
+/* ── UNIT NOTE ── */
+.unit-note{
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mid);margin-top:16px;
+}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  text-align:center;padding:24px 32px;
+  font-size:8px;letter-spacing:.25em;text-transform:uppercase;color:var(--mid);
+}
+
+/* ── LOADING ── */
+#loading{
+  position:fixed;inset:0;z-index:500;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:16px;
+  transition:opacity .5s;
+}
+#loading.fade{opacity:0;pointer-events:none}
+.loading-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.4em}
+.loading-bar-wrap{width:100px;height:1px;background:var(--border)}
+.loading-bar{height:1px;background:var(--fg);width:0%;transition:width .4s ease}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .7s ease both}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div class="grain"></div>
+
+<div id="loading">
+  <div class="loading-logo">SANTAI</div>
+  <div class="loading-bar-wrap"><div class="loading-bar" id="lbar"></div></div>
+</div>
+
+<header>
+  <a class="back-link" href="index.html">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
+    Back
+  </a>
+  <img class="logo-img" id="logoImg" src="" alt="SANTAI" loading="eager"/>
+  <div class="logo-text" id="logoText">SANTAI</div>
+</header>
+
+<main>
+  <div class="page-title anim">
+    <h1>Size Chart</h1>
+    <p>All measurements in centimetres</p>
+  </div>
+
+  <div class="guide anim" style="animation-delay:.1s">
+    <div class="guide-title">How to Measure</div>
+    <div class="guide-items">
+      <div class="guide-item">
+        <strong>Chest</strong>
+        <p>Measure around the fullest part of your chest, keeping the tape horizontal.</p>
+      </div>
+      <div class="guide-item">
+        <strong>Length</strong>
+        <p>Measure from the highest point of the shoulder down to the hem.</p>
+      </div>
+      <div class="guide-item">
+        <strong>Shoulder</strong>
+        <p>Measure from shoulder seam to shoulder seam across the back.</p>
+      </div>
+      <div class="guide-item">
+        <strong>Fit Note</strong>
+        <p>SANTAI pieces are cut oversized. When in doubt, size down.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="articles" id="articles"></div>
+</main>
+
+<footer id="footerTxt">SANTAI — All measurements in cm</footer>
+
+<script>
+const SB_URL='https://iddwjrusnkvblezkrqjz.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZHdqcnVzbmt2YmxlemtycWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NDg2NTYsImV4cCI6MjA4OTQyNDY1Nn0.Z_5QInMfYMbOY8HRz9omb-3LBKS4bU3V6q_-ESbgQW4';
+const H={'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`};
+
+// Cursor
+const cur=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{ cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
+
+function setBar(p){ document.getElementById('lbar').style.width=p+'%'; }
+function hideLoading(){
+  setBar(100);
+  setTimeout(()=>{ const l=document.getElementById('loading'); l.classList.add('fade'); setTimeout(()=>l.style.display='none',500); },200);
+}
+
+function parseSizes(s){
+  if(!s||!s.trim()) return [];
+  return s.trim().split('\n').filter(Boolean).map(l=>{
+    const[size,chest,length,shoulder]=l.split(',').map(x=>x.trim());
+    return {size,chest,length,shoulder};
+  });
+}
+
+function renderSzTable(sizes){
+  const rows=sizes.map(r=>`<tr>
+    <td>${r.size||''}</td>
+    <td>${r.chest||''} cm</td>
+    <td>${r.length||''} cm</td>
+    <td>${r.shoulder||''} cm</td>
+  </tr>`).join('');
+  return `<table class="sz">
+    <thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Shoulder</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderSzCards(sizes){
+  const cards=sizes.map(r=>`
+    <div class="sz-card">
+      <div class="sz-card-size">${r.size||''}</div>
+      <div class="sz-card-row"><span class="sz-card-label">Chest</span><span class="sz-card-val">${r.chest||''} cm</span></div>
+      <div class="sz-card-row"><span class="sz-card-label">Length</span><span class="sz-card-val">${r.length||''} cm</span></div>
+      <div class="sz-card-row"><span class="sz-card-label">Shoulder</span><span class="sz-card-val">${r.shoulder||''} cm</span></div>
+    </div>`).join('');
+  return `<div class="sz-cards">${cards}</div>`;
+}
+
+async function load(){
+  setBar(20);
+  try{
+    const [gRes,aRes]=await Promise.all([
+      fetch(`${SB_URL}/rest/v1/santai_global?id=eq.1`,{headers:H}),
+      fetch(`${SB_URL}/rest/v1/santai_articles?order=sort_order.asc`,{headers:H})
+    ]);
+    const [globals,arts]=await Promise.all([gRes.json(),aRes.json()]);
+    const g=globals[0]||{};
+    setBar(80);
+
+    // Apply logo
+    const li=document.getElementById('logoImg'), lt=document.getElementById('logoText');
+    if(g.logo_img){ li.src=g.logo_img; li.classList.add('show'); lt.style.display='none'; }
+
+    // Render articles
+    const container=document.getElementById('articles');
+    arts.forEach((art,i)=>{
+      if(!art.sizes||!art.sizes.trim()) return;
+      const sizes=parseSizes(art.sizes);
+      if(!sizes.length) return;
+      const block=document.createElement('div');
+      block.className='article-block anim';
+      block.style.animationDelay=(i*0.08+0.15)+'s';
+      block.innerHTML=`
+        <div class="article-name">${art.name||'Untitled'}</div>
+        <div class="article-sub">${art.sub||''}</div>
+        <div class="sz-wrap">
+          ${renderSzTable(sizes)}
+          ${renderSzCards(sizes)}
+        </div>
+        <div class="unit-note">All measurements in centimetres (cm)</div>`;
+      container.appendChild(block);
+    });
+
+    hideLoading();
+  }catch(e){
+    console.error(e);
+    document.getElementById('articles').innerHTML=`<p style="color:var(--mid);font-size:11px;letter-spacing:.15em;text-transform:uppercase">Could not load size chart. Please try again.</p>`;
+    hideLoading();
+  }
+}
+
+load();
+</script>
+</body>
+</html>
