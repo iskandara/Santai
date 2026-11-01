@@ -1,51 +1,64 @@
 # SANTAI design direction
 
-Written from the site as it stands (October 2026). Everything here describes choices already in the code, so treat it as a draft to edit: change any line that is not what you mean, and the site should follow.
+Written from the site as it stands. Edit any line that is not what you mean and the site should follow.
 
-Dial: ENERGY 2 / RHYTHM 1 / MOTION 2
+Dial: ENERGY 2 / RHYTHM 3 / MOTION 2
 
-Reading this as: a one-shirt-at-a-time clothing lookbook for people who follow the label, in a quiet monochrome editorial style, dial ENERGY 2 / RHYTHM 1 / MOTION 2.
+Reading this as: a one-shirt-at-a-time clothing storefront for people who want to own the shirt, in a quiet monochrome editorial style, dial ENERGY 2 / RHYTHM 3 / MOTION 2.
 
-## Identity
+## Idea
 
-SANTAI shows one piece at a time, full height, and lets you turn it over in your hands. The page is a stage for the garment, so the interface stays out of its way.
+SANTAI sells shirts as **memorabilia**: each one is catalogued like an object in an archive. A catalogue number, a name set large, a plate that holds the shirt, and a short museum-label of facts. The page exists to make one shirt feel worth owning, then make ordering it take seconds.
 
 ## Palette
 
 | Role | Value | Reason |
 |---|---|---|
-| Paper | `#f5f5f0` | A warm off-white reads as paper and print, not as a screen. |
-| Ink | `#0a0a0a` | Near-black, never pure black, for the same reason. |
-| Secondary text | `#5c5c58` | Darkest grey that still looks quiet. 6.1:1 on paper, so it passes WCAG AA. |
-| Status red / amber | `#e74c3c` / `#e67e22` | Only on the availability dot, for Sold Out and Running Low. This is the one accent, used where it carries meaning. |
+| Paper | `#f5f5f0` | Warm off-white reads as print, not as a screen. |
+| Plate | `#e8e4d9` | A darker paper the shirt photo sits on, so a white shirt still shows its edges. |
+| Ink | `#0a0a0a` | Near-black, never pure black. |
+| Secondary text | `#5c5c58` | Darkest grey that still looks quiet. 6.1:1 on paper. |
+| Band | `#0d0d0c` with `#b8b8b0` text | The order section is the one dark room on the page, so the end of the scroll feels like a decision. |
+| Status | `#0a0a0a` / `#b4530a` / `#b3261e` | Only on the availability dot, with the words beside it. The one accent, used where it carries meaning. |
 
-Theme: light only. The garment photos are shot on light grounds and the brand is paper-like. No toggle is shipped, so there is no second mode to keep working.
+Theme: light, with one dark band. The garment photos are shot on light grounds and the brand is paper-like.
 
 ## Type
 
-- **Bebas Neue**, wide tracking (about .38em), for the wordmark and product names. A tall condensed capital with generous spacing reads as a label stitched into a collar.
-- **Cormorant Garamond** for product descriptions and the size chart values. A literary serif gives the copy a human voice against the capitals.
-- **Courier Prime** for small utility text: availability, counters, ticker, controls. A typewriter face is the "tag on the garment" voice.
-- Small utility text is uppercase with wide tracking and never below 10px.
+- **Bebas Neue** for the wordmark, shirt names, prices and size buttons. Names are set very large and tight; the wordmark is small and widely tracked, like a label.
+- **Cormorant Garamond** italic for the story. A literary serif gives the one piece of real copy a human voice.
+- **Courier Prime** for labels, specs, controls and the catalogue numbers. The typewriter voice of a tag on the garment.
+- Small utility text is uppercase, widely tracked, never below 11px.
+
+## Layout and rhythm
+
+- Opening piece fills the first screen, with the plate and the sell side by side. Nothing competes with the first shirt.
+- Each piece uses a sticky plate beside scrolling facts, and the sides alternate. Spacing between pieces changes on purpose so the page does not read as a template.
+- A photo strip appears under a piece only when the editor has added photos. A marquee of the CMS running text sits after the first piece.
+- The page ends in the dark order band: a huge "Order", the ways to message, then shipping and returns.
+- On phones the plate stacks above the facts and a slim order bar follows the reader until the real order button is in view.
 
 ## Motifs
 
-- **Hold and rotate.** Pressing and holding the shirt turns it, reveals its details and plays its sound. It is the signature gesture of the site. Details and Flip buttons give the same content to keyboard and touch users.
-- **Grain.** A very faint film grain (3% opacity) sits over the page, so flat paper tones do not look like a default screen.
-- **Custom dot cursor** on desktop only. It turns into a ring over the shirt to say "you can drag this". It steps aside over real controls so the system pointer shows.
+- **Hold and turn.** Press and hold the plate and the page falls away to the shirt's own colour (or image) while it turns, with its sound if it has one. This is the signature gesture. A Flip button gives keyboard and touch users the same turn.
+- **Grain.** A faint film grain (3.5% opacity) keeps flat paper tones from looking like a default screen.
+- **Dot cursor** on desktop only. It becomes a ring over a plate, and steps aside over real controls.
+- **Catalogue numbers.** "No. 01 / 03" on every piece.
 
 ## Motion
 
-- Entry fade on load, one slide transition between pieces, one ticker, one availability blink.
-- Looping motion (ticker, blink, hint) has a Pause control and stops under `prefers-reduced-motion`.
-- No parallax, no scroll choreography. Motion either answers a gesture or shows status.
+- One entrance per element: a short rise and fade, and shirt names reveal word by word.
+- The marquee and the availability pulse loop. Both stop under the Pause control and under `prefers-reduced-motion`.
+- The order button fills from below on hover. No parallax, no scroll hijacking.
 
-## Rhythm
+## Buying
 
-One piece per screen, always the same composition. Uniform on purpose: sameness lets the garments differ.
+- Ordering is by message. WhatsApp if a number is set in the editor, otherwise Instagram with the message copied to the clipboard.
+- The message is written for the visitor: shirt name, size and price. Sold-out shirts offer a restock question instead.
+- A size must be chosen first. If the price is not set the page says "Message us for the price" and does not guess.
 
 ## Content rules
 
-- No invented products, numbers, quotes or taglines. If the collection cannot be loaded, say so.
+- No invented products, prices, fabric claims, quotes or taglines. Anything not entered in the editor is left out of the page.
 - Copy is plain and short. No em dashes.
-- Every control does something. If an optional link has no destination, it is not shown.
+- Every control does something. Optional links without a destination are not shown.
