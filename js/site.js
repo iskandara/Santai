@@ -22,6 +22,13 @@
     return el;
   }
   const pad2 = n => String(n).padStart(2, '0');
+  // Prices are in IDR. Numbers typed in the editor ("350000") show as "IDR 350,000"; anything else shows as typed.
+  const priceOf = art => {
+    const raw = String(extraOf(art).price || '').trim();
+    if(!raw) return '';
+    const digits = raw.replace(/[\s.,]/g, '');
+    return /^\d+$/.test(digits) ? 'IDR ' + Number(digits).toLocaleString('en-US') : raw;
+  };
 
   // Static drawing used when a shirt has no photo yet. No data goes into this markup.
   const PLACEHOLDER_SVG = `<svg class="plate-svg plate-front" viewBox="0 0 340 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Shirt photo not added yet"><path d="M90 90 L60 160 L30 155 L50 240 L90 235 L90 380 L250 380 L250 235 L290 240 L310 155 L280 160 L250 90 L220 70 Q170 50 120 70 Z" fill="#f5f5f0" stroke="#0a0a0a" stroke-width="2.5" stroke-linejoin="round"/><path d="M140 70 Q170 95 200 70" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round"/><line x1="170" y1="100" x2="170" y2="380" stroke="#0a0a0a" stroke-width=".6" stroke-dasharray="3 5" opacity=".25"/></svg>`;
@@ -39,7 +46,7 @@
     return { cls: 'ok', text: 'Available now' };
   };
   function orderText(art, size, restock){
-    const price = (extraOf(art).price || '').trim();
+    const price = priceOf(art);
     const name = art.name || 'this shirt';
     if(restock) return `Hi SANTAI, is ${name}${size ? ' in size ' + size : ''} coming back in stock?`;
     return `Hi SANTAI, I'd like to order ${name}${size ? ', size ' + size : ''}${price ? ' (' + price + ')' : ''}.`;
@@ -115,7 +122,7 @@
       nameEl.append(word, ' ');
     });
 
-    const price = (ex.price || '').trim();
+    const price = priceOf(art);
     const specRows = [['Fabric', ex.fabric], ['Fit', ex.fit]].filter(([, v]) => v && String(v).trim());
 
     const radioName = `size-${art.id}`;
@@ -288,7 +295,7 @@
     const show = !!piece && !buyShown && !bandVisible && piece.getBoundingClientRect().height > 0;
     if(piece){
       const art = Santai.state.a.find(x => `piece-${x.id}` === piece.id);
-      if(art){ $('#mbarName').textContent = art.name || 'Untitled'; $('#mbarPrice').textContent = (extraOf(art).price || '').trim() || 'Message us for the price'; }
+      if(art){ $('#mbarName').textContent = art.name || 'Untitled'; $('#mbarPrice').textContent = priceOf(art) || 'Message us for the price'; }
     }
     bar.classList.toggle('show', show);
   }

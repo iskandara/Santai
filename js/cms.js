@@ -137,7 +137,7 @@
         <div class="cms-fld"><label for="a-avail">Availability</label>
           <select id="a-avail" class="cms-select"><option value="Available Now">Available Now</option><option value="Running Low">Running Low</option><option value="Sold Out">Sold Out</option></select>
         </div>
-        <div class="cms-fld"><label for="a-price">Price (as customers should read it)</label><input type="text" id="a-price" placeholder="IDR 350,000"/></div>
+        <div class="cms-fld"><label for="a-price">Price in IDR (numbers only)</label><input type="text" id="a-price" inputmode="numeric" placeholder="350000"/><div class="compress-note">Shows on the site as IDR 350,000.</div></div>
         <div class="cms-fld"><label for="a-fabric">Fabric</label><input type="text" id="a-fabric"/></div>
         <div class="cms-fld"><label for="a-fit">Fit</label><input type="text" id="a-fit"/></div>
         <div class="cms-fld"><label for="a-story">Story or release notes</label><textarea id="a-story" rows="4"></textarea></div>
