@@ -511,7 +511,7 @@ footer{
         <img class="prev-thumb" id="pv-logo" alt=""/>
         <button class="ghost-btn" id="remove-logo-btn">✕ Remove Logo, Use Text</button>
       </div>
-      <div class="cms-fld"><label>Instagram URL</label><input type="text" id="g-ig-url" placeholder="https://instagram.com/yourbrand"/></div>
+      <div class="cms-fld"><label>Instagram URL</label><input type="text" id="g-ig-url" placeholder="https://instagram.com/santai.memorabilia"/></div>
       <div class="cms-fld"><label>Running Text (separate with |)</label><textarea id="g-ticker" rows="3"></textarea></div>
       <div class="cms-fld">
         <label>Size Chart (one per line: S,chest,length,shoulder)</label>
@@ -593,6 +593,7 @@ const SB_URL = 'https://iddwjrusnkvblezkrqjz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZHdqcnVzbmt2YmxlemtycWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NDg2NTYsImV4cCI6MjA4OTQyNDY1Nn0.Z_5QInMfYMbOY8HRz9omb-3LBKS4bU3V6q_-ESbgQW4';
 const BUCKET = 'santai-assets';
 const PW_KEY = 'santai_cms_pw';
+const DEFAULT_IG_URL = 'https://instagram.com/santai.memorabilia';
 const H = { 'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json' };
 
 async function sbGet(t,q=''){ const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{headers:H}); if(!r.ok) throw new Error(await r.text()); return r.json(); }
@@ -812,9 +813,9 @@ function applyGlobal(){
   else siteBgLayer.classList.remove('on');
   // Instagram link — always visible, href updates if set
   const igEl=document.getElementById('igLink');
-  // No URL set means no link: hide it rather than ship a control that does nothing
-  if(g.ig_url && g.ig_url.trim()){ igEl.href=g.ig_url.trim(); igEl.style.display=''; }
-  else { igEl.removeAttribute('href'); igEl.style.display='none'; }
+  // The CMS value wins; otherwise the brand account. Never ship a link with no destination.
+  const igUrl=(g.ig_url&&g.ig_url.trim())||DEFAULT_IG_URL;
+  igEl.href=igUrl; igEl.style.display='';
 }
 
 function applyArticleStatus(){
