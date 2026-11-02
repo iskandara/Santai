@@ -40,7 +40,10 @@ Theme: light, with one dark band. The garment photos are shot on light grounds a
 
 ## Motifs
 
-- **The deer.** The painted deer from Deer Comes the Sun, cut out and rigged: the painting gives the body, head and tail; drawn legs in the painting's own texture let it stand, graze and run in bounds. On a shirt whose print already shows this deer, it jumps into the print and becomes the printed deer. On other shirts it stands on the shirt. The spot is set per shirt in the editor.
+- **The deer.** The painted deer from Deer Comes the Sun, cut out and rigged: the painting gives the body, head and tail; drawn legs in the painting's own texture let it stand, graze and run in bounds. Each shirt sets how it lands, in the editor:
+  - **Into the print** (Deer Comes the Sun): it leaps, turns into the painting's exact pose over the printed deer, and fades into it.
+  - **Herd** (How Deer Is Your Love): it slips behind the shirt, cut out by the photo's own outline, while the three deer of that painting come in from the screen edges, shrink to print size and settle onto their places in the oval.
+  - **Stand**: it stands on the shirt.
 - **Hold and turn.** Press and hold a shirt and the page falls away to the shirt's own colour while it turns. A quick click opens the details instead.
 - **Grain.** A faint film grain (3.5% opacity) keeps flat paper tones from looking like a default screen.
 - **Dot cursor** on desktop only. It becomes a ring over a shirt.

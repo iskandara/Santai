@@ -106,7 +106,7 @@ button:disabled{cursor:not-allowed}
 .piece.is-flip .piece-info{grid-column:1 / span 5;text-align:right;justify-self:end}
 .piece.is-flip .row-label{justify-content:flex-end}
 
-.plate{position:relative;width:min(100%,calc((100svh - var(--hdr) - 4rem) * .75));aspect-ratio:3 / 4;margin-inline:auto;background:var(--plate);touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden;cursor:pointer;transition:background .4s var(--ease),box-shadow .4s var(--ease)}
+.plate{position:relative;width:min(100%,calc((100svh - var(--hdr) - 4rem) * var(--ar, .75)));aspect-ratio:var(--ar, .75);margin-inline:auto;background:var(--plate);touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden;cursor:pointer;transition:background .4s var(--ease),box-shadow .4s var(--ease)}
 .plate:hover{box-shadow:0 0 0 1px var(--ink)}
 .plate-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;will-change:transform}
 .plate-back{opacity:0}
@@ -126,7 +126,7 @@ button:disabled{cursor:not-allowed}
   .piece{display:flex;flex-direction:column;justify-content:center;gap:1.75rem;padding-block:clamp(4rem,14vw,7rem)}
   .piece.is-flip .piece-info{text-align:left;justify-self:auto}
   .piece.is-flip .row-label{justify-content:space-between}
-  .plate{width:min(100%,calc((100svh - var(--hdr) - 12rem) * .75),520px)}
+  .plate{width:min(100%,calc((100svh - var(--hdr) - 12rem) * var(--ar, .75)),var(--ar-max, 520px))}
   .piece-info{max-width:none;width:100%}
 }
 

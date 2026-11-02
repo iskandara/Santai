@@ -175,13 +175,14 @@
           <select id="a-deer-mode" class="cms-select">
             <option value="stand">Stands on the shirt</option>
             <option value="into">Jumps into the print (the print already shows this deer)</option>
+            <option value="herd">Hides behind the shirt, and the herd from the print walks in</option>
           </select>
           <div class="deer-row">
             <label class="mini" for="a-deer-x">Across %<input type="number" id="a-deer-x" min="0" max="100" step="1" placeholder="50"/></label>
             <label class="mini" for="a-deer-y">Down %<input type="number" id="a-deer-y" min="0" max="100" step="1" placeholder="56"/></label>
             <label class="mini" for="a-deer-size">Size %<input type="number" id="a-deer-size" min="5" max="100" step="1" placeholder="40"/></label>
           </div>
-          <div class="compress-note">Across and down are measured from the photo's top-left corner, in %. For "Stands", they mark where its hooves touch. For "Jumps into the print", they mark the point between the printed deer's hooves, and size is the printed deer's width (antler tips to tail) as a share of the photo's width.</div>
+          <div class="compress-note">Across and down are measured from the photo's top-left corner, in %. For "Stands", they mark where its hooves touch. For "Jumps into the print", they mark the point between the printed deer's hooves, and size is the printed deer's width (antler tips to tail) as a share of the photo's width. For "Herd", they mark the top-left corner of the herd painting as it sits on the print, and size is the full painting's width as a share of the photo's width.</div>
         </div>
         <div class="cms-fld"><label for="a-sizes">Sizes (one per line: S,chest,length,shoulder)</label><textarea id="a-sizes" rows="4"></textarea></div>
         <button class="save-btn" id="saveBtn" type="button">SAVE ALL CHANGES</button>
@@ -302,7 +303,7 @@
     $('#a-avail').value = a.avail_status || 'Available Now';
     $('#a-price').value = ex.price || ''; $('#a-fabric').value = ex.fabric || ''; $('#a-fit').value = ex.fit || ''; $('#a-story').value = ex.story || '';
     const dz = ex.deer || {};
-    $('#a-deer-mode').value = dz.mode === 'into' ? 'into' : 'stand';
+    $('#a-deer-mode').value = ['into', 'herd'].includes(dz.mode) ? dz.mode : 'stand';
     $('#a-deer-x').value = dz.x ?? ''; $('#a-deer-y').value = dz.y ?? ''; $('#a-deer-size').value = dz.size ?? '';
     ['a-price', 'a-fabric', 'a-fit', 'a-story', 'f-gallery', 'a-deer-mode', 'a-deer-x', 'a-deer-y', 'a-deer-size'].forEach(id => { $('#' + id).disabled = !ok; });
     galItems = (Array.isArray(ex.gallery) ? ex.gallery : []).filter(safeUrl).map(url => ({ url }));
@@ -362,7 +363,7 @@
   // empty fields fall back to the page's defaults
   function deerSpot(){
     const v = id => { const n = parseFloat($('#' + id).value); return Number.isFinite(n) ? n : undefined; };
-    const d = { mode: $('#a-deer-mode').value === 'into' ? 'into' : 'stand', x: v('a-deer-x'), y: v('a-deer-y'), size: v('a-deer-size') };
+    const d = { mode: ['into', 'herd'].includes($('#a-deer-mode').value) ? $('#a-deer-mode').value : 'stand', x: v('a-deer-x'), y: v('a-deer-y'), size: v('a-deer-size') };
     Object.keys(d).forEach(k => d[k] === undefined && delete d[k]);
     return d;
   }

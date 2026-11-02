@@ -29,6 +29,30 @@
   });
   const GRASS = ['#8b9a52', '#b9a650', '#6f8048'];
 
+  /* The herd from the How Deer Is Your Love painting. Boxes are pixels in that 1600x2000 painting.
+     On a shirt set to "herd", the lone deer slips behind the shirt and these three come in from the edges
+     of the screen, each settling exactly onto its own place in the print, then hand over to the print. */
+  const PAINT_W = 1600;
+  const HERD = [
+    { key: 'doe',  box: [212, 1500, 423, 304], from: 'left',   delay: 0,   hops: 4 },
+    { key: 'herd', box: [765, 1309, 291, 215], from: 'right',  delay: .12, hops: 5 },
+    { key: 'fawn', box: [1045, 1319, 284, 302], from: 'bottom', delay: .24, hops: 4 },
+  ];
+  HERD.forEach(d => {
+    d.img = new Image(); d.img.decoding = 'async';
+    d.img.src = canvas.dataset['herd' + d.key[0].toUpperCase() + d.key.slice(1)] || `img/herd-${d.key}.webp`;
+  });
+  let herdAlpha = 0, lastHerd = null;
+  const layer = document.createElement('canvas'), lctx = layer.getContext('2d');
+
+  // the photo inside a plate, as drawn on screen (object-fit: contain)
+  function photoRect(pl){
+    const r = pl.getBoundingClientRect(), img = pl.querySelector('img.plate-front');
+    const ar = img && img.naturalWidth ? img.naturalWidth / img.naturalHeight : r.width / r.height;
+    let w = r.width, h = w / ar; if(h > r.height){ h = r.height; w = h * ar; }
+    return { left: r.left + (r.width - w) / 2, top: r.top + (r.height - h) / 2, w, h, img };
+  }
+
   function measure(){
     W = innerWidth; H = innerHeight; dpr = Math.min(2, devicePixelRatio || 1);
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
@@ -42,9 +66,15 @@
       stops.push({ kind: 'meadow', x: r.left + r.width / 2, y: r.top + scrollY + r.height * .7, w, at: 0 });
     }
     $$('.plate').forEach(pl => {
-      const r = pl.getBoundingClientRect(), top = r.top + scrollY;
+      const r = pl.getBoundingClientRect(), top = r.top + scrollY, P = photoRect(pl), ptop = P.top + scrollY;
       const lx = +pl.dataset.landX || 50, ly = +pl.dataset.landY || 56, ls = +pl.dataset.landSize || 40;
-      stops.push({ kind: 'shirt', mode: pl.dataset.landMode || 'stand', el: pl, x: r.left + r.width * lx / 100, y: top + r.height * ly / 100, w: r.width * ls / 100, at: clamp(top + r.height / 2 - H / 2, 0, maxScroll) });
+      const mode = pl.dataset.landMode || 'stand', at = clamp(top + r.height / 2 - H / 2, 0, maxScroll);
+      if(mode === 'herd'){
+        // the lone deer runs to the middle of the shirt, where it disappears behind it
+        stops.push({ kind: 'shirt', mode, el: pl, cal: { x: lx, y: ly, size: ls }, x: P.left + P.w / 2, y: ptop + P.h * .48, w: P.w * .3, at });
+      } else {
+        stops.push({ kind: 'shirt', mode, el: pl, x: P.left + P.w * lx / 100, y: ptop + P.h * ly / 100, w: P.w * ls / 100, at });
+      }
     });
     for(let i = 1; i < stops.length; i++) if(stops[i].at <= stops[i - 1].at) stops[i].at = stops[i - 1].at + 1;
   }
@@ -54,16 +84,16 @@
     if(!stops.length) return null;
     const first = stops[0], last = stops[stops.length - 1];
     if(stops.length === 1 || y <= first.at) return { x: first.x, y: first.y - y, w: first.w, moving: false, stop: 0, u: 0, into: 0 };
-    if(y >= last.at) return { x: last.x, y: last.y - y, w: last.w, moving: false, stop: stops.length - 1, u: 1, into: last.mode === 'into' ? 1 : 0 };
+    if(y >= last.at) return { x: last.x, y: last.y - y, w: last.w, moving: false, stop: stops.length - 1, u: 1, into: last.mode === 'into' ? 1 : 0, A: last, B: last };
     let k = 0; while(y >= stops[k + 1].at) k++;
     const A = stops[k], B = stops[k + 1], t = (y - A.at) / (B.at - A.at);
-    if(reduce){ const S = t < .5 ? A : B; return { x: S.x, y: S.y - y, w: S.w, moving: false, stop: t < .5 ? k : k + 1, u: t < .5 ? 0 : 1, into: (t >= .5 && B.mode === 'into') ? 1 : 0 }; }
+    if(reduce){ const S = t < .5 ? A : B; return { x: S.x, y: S.y - y, w: S.w, moving: false, stop: t < .5 ? k : k + 1, u: t < .5 ? 0 : 1, into: (t >= .5 && B.mode === 'into') ? 1 : 0, A: S, B: S }; }
     // a short pause where it stands, a run that keeps pace with the page, and a leap onto the shirt
     const u = clamp((t - .05) / .9, 0, 1), e = ease(u);
     // jumping into a print it must arrive moving right (the painted deer faces right), so it swings in from the left
     const side = B.mode === 'into' ? -1 : (k % 2 ? -1 : 1);
     const swing = side * Math.min(W * .26, 340) * Math.sin(Math.PI * u);
-    const jump = u > .76 ? Math.sin(Math.PI * (u - .76) / .24) * Math.min(H * .16, 150) : 0;
+    const jump = B.mode !== 'herd' && u > .76 ? Math.sin(Math.PI * (u - .76) / .24) * Math.min(H * .16, 150) : 0;
     return {
       x: lerp(A.x, B.x, e) + swing,
       y: lerp(A.y, B.y, u) - jump - y,
@@ -72,7 +102,8 @@
       stop: u < .5 ? k : k + 1,
       u,
       // how far it has turned into the painted leap, for prints that already carry this deer
-      into: B.mode === 'into' ? clamp((u - .84) / .14, 0, 1) : 0
+      into: B.mode === 'into' ? clamp((u - .84) / .14, 0, 1) : 0,
+      A, B
     };
   }
 
@@ -92,6 +123,44 @@
       ctx.stroke();
     });
     ctx.globalAlpha = 1;
+  }
+
+  /* the lone deer drawn on its own layer, with the shirt cut out of it, so it reads as passing behind the shirt */
+  function drawBehind(pl, draw){
+    const P = photoRect(pl);
+    if(layer.width !== canvas.width || layer.height !== canvas.height){ layer.width = canvas.width; layer.height = canvas.height; }
+    lctx.setTransform(dpr, 0, 0, dpr, 0, 0); lctx.clearRect(0, 0, W, H);
+    draw(lctx);
+    if(P.img && P.img.complete && P.img.naturalWidth){
+      lctx.globalCompositeOperation = 'destination-out';
+      lctx.drawImage(P.img, P.left, P.top, P.w, P.h);
+      lctx.globalCompositeOperation = 'source-over';
+    }
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(layer, 0, 0); ctx.restore();
+  }
+
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  function drawHerd(stop, p, alpha, time){
+    if(alpha <= .002) return;
+    const P = photoRect(stop.el), c = stop.cal;
+    const s = P.w * c.size / 100 / PAINT_W, ox = P.left + P.w * c.x / 100, oy = P.top + P.h * c.y / 100;
+    HERD.forEach(d => {
+      if(!d.img.complete || !d.img.naturalWidth) return;
+      const q = clamp((p - d.delay) / (1 - d.delay), 0, 1);
+      if(q <= 0) return;
+      const [bx, by, bw, bh] = d.box;
+      const tw = bw * s, th = bh * s, tx = ox + bx * s + tw / 2, ty = oy + by * s + th;   // target: centre-bottom of the sprite
+      const e = easeOut(q), k = lerp(5, 1, e);   // big as they enter at the screen edge, print-size as they settle
+      const sx = d.from === 'left' ? -tw * 3 : d.from === 'right' ? W + tw * 3 : W * .78;
+      const sy = d.from === 'bottom' ? H + th * 3.5 : clamp(ty + H * .12, th * 3, H - 10);
+      const hop = reduce ? 0 : Math.abs(Math.sin(q * Math.PI * d.hops)) * (1 - q) * th * 2.2 * k + (q < 1 ? Math.sin(time * 9 + d.delay * 20) * th * .05 * (1 - q) : 0);
+      const x = lerp(sx, tx, e), y = lerp(sy, ty, e) - hop;
+      const w = tw * k, h = th * k;
+      ctx.save(); ctx.globalAlpha = alpha;
+      ctx.translate(x, y); ctx.rotate((reduce ? 0 : Math.sin(q * Math.PI * d.hops) * (1 - q) * 6) * Math.PI / 180);
+      ctx.drawImage(d.img, -w / 2, -h, w, h);
+      ctx.restore();
+    });
   }
 
   let lastT = performance.now();
@@ -139,7 +208,21 @@
     st.leap = reduce ? intoNow : lerp(st.leap, intoNow, 1 - Math.exp(-dt * 18));
     if(intoNow > 0 && T.moving) st.phase = lerp(st.phase, 0, intoNow);
     const landedInto = !T.moving && intoNow >= 1;
-    st.alpha = reduce ? (landedInto ? 0 : 1) : lerp(st.alpha, landedInto ? 0 : 1, 1 - Math.exp(-dt * (landedInto ? 5 : 10)));
+    // the herd: which shirt it belongs to, and how far along its entrance is
+    const A = T.A || stops[0], B = T.B || stops[0];
+    const atHerd = !T.moving && stops[T.stop] && stops[T.stop].mode === 'herd';
+    let herdStop = null, herdP = 0;
+    if(T.moving && B.mode === 'herd'){ herdStop = B; herdP = clamp((T.u - .5) / .46, 0, 1); }
+    else if(atHerd){ herdStop = stops[T.stop]; herdP = 1; }
+    const herdLanded = atHerd || herdP >= 1;
+    herdAlpha = reduce ? (herdStop && !herdLanded ? 1 : 0) : lerp(herdAlpha, herdStop ? (herdLanded ? 0 : 1) : 0, 1 - Math.exp(-dt * (herdLanded ? 3 : 14)));
+    if(!herdStop && herdAlpha < .01) herdAlpha = 0;
+    // the lone deer: gone behind a herd shirt, back out when it leaves
+    let loneTarget = landedInto ? 0 : 1;
+    if(T.moving && B.mode === 'herd') loneTarget = 1 - clamp((T.u - .92) / .06, 0, 1); // hidden by the shirt itself well before this
+    if(atHerd) loneTarget = 0;
+    if(T.moving && A.mode === 'herd') loneTarget = clamp(T.u / .12, 0, 1);
+    st.alpha = reduce ? loneTarget : lerp(st.alpha, loneTarget, 1 - Math.exp(-dt * (loneTarget < st.alpha ? 6 : 12)));
     if(intoNow > .5) st.facing = 1;
 
     const scale = st.w / deer.width;
@@ -147,8 +230,13 @@
     // a soft shadow while it stands
     const sh = (1 - st.run) * (1 - st.leap) * .16 * st.alpha;
     if(sh > .01){ ctx.fillStyle = `rgba(55,40,25,${sh})`; ctx.beginPath(); ctx.ellipse(st.x, st.y + 2, st.w * .34, st.w * .035, 0, 0, Math.PI * 2); ctx.fill(); }
-    deer.draw(ctx, st.x, st.y, scale, st.facing, { run: st.run * (1 - st.leap), phase: st.phase, graze: st.graze, look: st.look, nibble: st.nibble, tail: st.tail, leap: st.leap, alpha: st.alpha, time: reduce ? 0 : time });
+    const pose = { run: st.run * (1 - st.leap), phase: st.phase, graze: st.graze, look: st.look, nibble: st.nibble, tail: st.tail, leap: st.leap, alpha: st.alpha, time: reduce ? 0 : time };
+    const behind = (T.moving && B.mode === 'herd') ? B : (T.moving && A.mode === 'herd') ? A : null;
+    if(behind && st.alpha > .002) drawBehind(behind.el, c => deer.draw(c, st.x, st.y, scale, st.facing, pose));
+    else deer.draw(ctx, st.x, st.y, scale, st.facing, pose);
     drawGrass(time, true);
+    if(herdStop || herdAlpha > 0) drawHerd(herdStop || lastHerd, herdStop ? herdP : 1, herdAlpha, time);
+    if(herdStop) lastHerd = herdStop;
   }
 
   const img = new Image();

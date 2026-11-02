@@ -109,10 +109,14 @@
       // where the deer lands on this photo: its anchor (% across, % down), its width (% of the photo), and whether
       // it stands on the shirt or jumps into the print and becomes the deer already printed there
       'data-land-x': num(land.x, 50, 0, 100), 'data-land-y': num(land.y, 56, 0, 100), 'data-land-size': num(land.size, 40, 5, 100),
-      'data-land-mode': land.mode === 'into' ? 'into' : 'stand'
+      'data-land-mode': ['into', 'herd'].includes(land.mode) ? land.mode : 'stand'
     });
     if(front){
-      plate.append(h('img', { class: 'plate-img plate-front', src: front, alt: `${name}, front`, width: 3, height: 4, decoding: 'async', draggable: 'false', loading: i === 0 ? 'eager' : 'lazy', fetchpriority: i === 0 ? 'high' : null }));
+      const fimg = h('img', { class: 'plate-img plate-front', src: front, alt: `${name}, front`, width: 3, height: 4, decoding: 'async', draggable: 'false', loading: i === 0 ? 'eager' : 'lazy', fetchpriority: i === 0 ? 'high' : null });
+      // the plate takes the photo's own shape, so the deer's landing spot maps straight onto the photo
+      const fit = () => { if(fimg.naturalWidth){ plate.style.setProperty('--ar', (fimg.naturalWidth / fimg.naturalHeight).toFixed(4)); if(window.SantaiScene) window.SantaiScene.refresh(); } };
+      fimg.addEventListener('load', fit); if(fimg.complete) fit();
+      plate.append(fimg);
     } else plate.insertAdjacentHTML('afterbegin', PLACEHOLDER_SVG);
     if(back) plate.append(h('img', { class: 'plate-img plate-back', src: back, alt: `${name}, back`, width: 3, height: 4, decoding: 'async', draggable: 'false', loading: 'lazy' }));
     plate.append(h('span', { class: 'plate-no', text: `No. ${pad2(i + 1)}` }), h('span', { class: 'plate-deg', 'aria-hidden': 'true', text: '0°' }));
