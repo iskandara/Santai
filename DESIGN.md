@@ -2,9 +2,9 @@
 
 Written from the site as it stands. Edit any line that is not what you mean and the site should follow.
 
-Dial: ENERGY 2 / RHYTHM 3 / MOTION 2
+Dial: ENERGY 2 / RHYTHM 3 / MOTION 3
 
-Reading this as: a one-shirt-at-a-time clothing storefront for people who want to own the shirt, in a quiet monochrome editorial style, dial ENERGY 2 / RHYTHM 3 / MOTION 2.
+Reading this as: a one-shirt-at-a-time clothing storefront for people who want to own the shirt, in a quiet monochrome editorial style, dial ENERGY 2 / RHYTHM 3 / MOTION 3.
 
 ## Idea
 
@@ -32,22 +32,24 @@ Theme: light, with one dark band. The garment photos are shot on light grounds a
 
 ## Layout and rhythm
 
-- Opening piece fills the first screen, with the plate and the sell side by side. Nothing competes with the first shirt.
-- Each piece uses a sticky plate beside scrolling facts, and the sides alternate. Spacing between pieces changes on purpose so the page does not read as a template.
-- A photo strip appears under a piece only when the editor has added photos. A marquee of the CMS running text sits after the first piece.
+- The first screen holds only the deer, grazing in a small meadow. No header, no words except a faint "Scroll".
+- Scrolling sends the deer running down the page. It keeps pace with the scroll, swings across the page, and leaps onto the next shirt. Scrolling up sends it back.
+- Each shirt fills one screen: the photo plate and the name. Price, sizes, story and ordering live in a details panel that opens when the shirt is clicked.
+- Shirts alternate sides. A marquee of the CMS running text sits after the first shirt.
 - The page ends in the dark order band: a huge "Order", the ways to message, then shipping and returns.
-- On phones the plate stacks above the facts and a slim order bar follows the reader until the real order button is in view.
 
 ## Motifs
 
-- **Hold and turn.** Press and hold the plate and the page falls away to the shirt's own colour (or image) while it turns, with its sound if it has one. This is the signature gesture. A Flip button gives keyboard and touch users the same turn.
+- **The deer.** The painted deer from Deer Comes the Sun, cut out and rigged: the painting gives the body, head and tail; drawn legs in the painting's own texture let it stand, graze and run in bounds. On a shirt whose print already shows this deer, it jumps into the print and becomes the printed deer. On other shirts it stands on the shirt. The spot is set per shirt in the editor.
+- **Hold and turn.** Press and hold a shirt and the page falls away to the shirt's own colour while it turns. A quick click opens the details instead.
 - **Grain.** A faint film grain (3.5% opacity) keeps flat paper tones from looking like a default screen.
-- **Dot cursor** on desktop only. It becomes a ring over a plate, and steps aside over real controls.
-- **Catalogue numbers.** "No. 01 / 03" on every piece.
+- **Dot cursor** on desktop only. It becomes a ring over a shirt.
+- **Catalogue numbers.** "No. 01 / 02" on every shirt.
 
 ## Motion
 
-- One entrance per element: a short rise and fade, and shirt names reveal word by word.
+- The deer is the one orchestrated motion. Everything else enters once: a short rise and fade, and shirt names reveal word by word.
+- Under `prefers-reduced-motion` the deer does not run: it appears at the nearest stop, still.
 - The marquee and the availability pulse loop. Both stop under the Pause control and under `prefers-reduced-motion`.
 - The order button fills from below on hover. No parallax, no scroll hijacking.
 

@@ -170,6 +170,19 @@
           <img class="prev-thumb" id="pv-hold-bg" alt=""/>
         </div>
         <div class="cms-fld"><label for="a-hold-color">Hold background colour (fallback, e.g. #1a1a2e)</label><input type="text" id="a-hold-color" placeholder="#1a1a2e"/></div>
+        <div class="cms-fld">
+          <label for="a-deer-mode">How the deer lands on this shirt</label>
+          <select id="a-deer-mode" class="cms-select">
+            <option value="stand">Stands on the shirt</option>
+            <option value="into">Jumps into the print (the print already shows this deer)</option>
+          </select>
+          <div class="deer-row">
+            <label class="mini" for="a-deer-x">Across %<input type="number" id="a-deer-x" min="0" max="100" step="1" placeholder="50"/></label>
+            <label class="mini" for="a-deer-y">Down %<input type="number" id="a-deer-y" min="0" max="100" step="1" placeholder="56"/></label>
+            <label class="mini" for="a-deer-size">Size %<input type="number" id="a-deer-size" min="5" max="100" step="1" placeholder="40"/></label>
+          </div>
+          <div class="compress-note">Across and down are measured from the photo's top-left corner, in %. For "Stands", they mark where its hooves touch. For "Jumps into the print", they mark the point between the printed deer's hooves, and size is the printed deer's width (antler tips to tail) as a share of the photo's width.</div>
+        </div>
         <div class="cms-fld"><label for="a-sizes">Sizes (one per line: S,chest,length,shoulder)</label><textarea id="a-sizes" rows="4"></textarea></div>
         <button class="save-btn" id="saveBtn" type="button">SAVE ALL CHANGES</button>
         <div class="save-confirm" id="save-confirm">✓ Saved. Live for everyone</div>
@@ -288,7 +301,10 @@
     $('#a-sizes').value = a.sizes || 'S,104,72,48\nM,110,75,51\nL,116,78,54\nXL,122,81,57';
     $('#a-avail').value = a.avail_status || 'Available Now';
     $('#a-price').value = ex.price || ''; $('#a-fabric').value = ex.fabric || ''; $('#a-fit').value = ex.fit || ''; $('#a-story').value = ex.story || '';
-    ['a-price', 'a-fabric', 'a-fit', 'a-story', 'f-gallery'].forEach(id => { $('#' + id).disabled = !ok; });
+    const dz = ex.deer || {};
+    $('#a-deer-mode').value = dz.mode === 'into' ? 'into' : 'stand';
+    $('#a-deer-x').value = dz.x ?? ''; $('#a-deer-y').value = dz.y ?? ''; $('#a-deer-size').value = dz.size ?? '';
+    ['a-price', 'a-fabric', 'a-fit', 'a-story', 'f-gallery', 'a-deer-mode', 'a-deer-x', 'a-deer-y', 'a-deer-size'].forEach(id => { $('#' + id).disabled = !ok; });
     galItems = (Array.isArray(ex.gallery) ? ex.gallery : []).filter(safeUrl).map(url => ({ url }));
     renderGallery();
     setPreview($('#pv-shirt'), a.shirt_img); setPreview($('#pv-shirt-back'), a.shirt_back_img); setPreview($('#pv-hold-bg'), a.hold_bg);
@@ -343,6 +359,14 @@
     }catch(e){ alert('Error: ' + e.message); }
   });
 
+  // empty fields fall back to the page's defaults
+  function deerSpot(){
+    const v = id => { const n = parseFloat($('#' + id).value); return Number.isFinite(n) ? n : undefined; };
+    const d = { mode: $('#a-deer-mode').value === 'into' ? 'into' : 'stand', x: v('a-deer-x'), y: v('a-deer-y'), size: v('a-deer-size') };
+    Object.keys(d).forEach(k => d[k] === undefined && delete d[k]);
+    return d;
+  }
+
   /* ────────── save ────────── */
   $('#saveBtn').addEventListener('click', async () => {
     const btn = $('#saveBtn'), conf = $('#save-confirm'), errEl = $('#save-err');
@@ -368,7 +392,7 @@
       Santai.state.g = { ...g, ...ng };
 
       const na = { name: $('#a-name').value, sub: $('#a-sub').value, description: $('#a-desc').value, hold_color: $('#a-hold-color').value, sizes: $('#a-sizes').value, avail_status: $('#a-avail').value, shirt_img: shirt, shirt_back_img: shirtBack, hold_bg: holdBg, audio_url: audio };
-      if(hasExtra()) na.extra = { ...extraOf(art), price: $('#a-price').value.trim(), fabric: $('#a-fabric').value.trim(), fit: $('#a-fit').value.trim(), story: $('#a-story').value.trim(), gallery };
+      if(hasExtra()) na.extra = { ...extraOf(art), price: $('#a-price').value.trim(), fabric: $('#a-fabric').value.trim(), fit: $('#a-fit').value.trim(), story: $('#a-story').value.trim(), gallery, deer: deerSpot() };
       await sbPatch('santai_articles', `id=eq.${art.id}`, na);
       A()[cmsIdx] = { ...art, ...na };
 
