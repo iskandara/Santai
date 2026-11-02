@@ -14,10 +14,10 @@ SANTAI sells shirts as **memorabilia**: each one is catalogued like an object in
 
 | Role | Value | Reason |
 |---|---|---|
-| Paper | `#f5f5f0` | Warm off-white reads as print, not as a screen. |
+| Paper | `#fafaf7` | A barely warm white: clean like a gallery wall, without the cold blue of pure #fff. |
 | Plate | `#e8e4d9` | A darker paper the shirt photo sits on, so a white shirt still shows its edges. |
 | Ink | `#0a0a0a` | Near-black, never pure black. |
-| Secondary text | `#5c5c58` | Darkest grey that still looks quiet. 6.1:1 on paper. |
+| Secondary text | `#5c5c58` | Darkest grey that still looks quiet. 6.4:1 on paper. |
 | Band | `#0d0d0c` with `#b8b8b0` text | The order section is the one dark room on the page, so the end of the scroll feels like a decision. |
 | Status | `#0a0a0a` / `#b4530a` / `#b3261e` | Only on the availability dot, with the words beside it. The one accent, used where it carries meaning. |
 
