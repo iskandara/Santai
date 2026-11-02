@@ -160,6 +160,13 @@
           <div class="gal-thumbs" id="galThumbs"></div>
         </div>
         <div class="cms-fld">
+          <label for="f-bg">Background painting (fades in softly behind this shirt as it scrolls into view)</label>
+          <label class="up-btn">↑ Upload Painting<input type="file" id="f-bg" accept="image/*"></label>
+          <div class="compress-note">Compressed to ≤500KB. The repo's img/ folder has bg-deer-comes.webp and bg-how-deer.webp ready to upload.</div>
+          <img class="prev-thumb" id="pv-bg" alt=""/>
+          <button class="ghost-btn" id="remove-bg-btn" type="button">✕ Remove Painting</button>
+        </div>
+        <div class="cms-fld">
           <label for="f-audio">Hold audio (loops while someone holds the shirt)</label>
           <label class="up-btn">↑ Upload Audio File (mp3/ogg)<input type="file" id="f-audio" accept="audio/*"></label>
           <div class="compress-note" id="audio-note"></div>
@@ -196,7 +203,7 @@
 
   const gate = $('#pw-gate'), ov = $('#cms-overlay');
   let cmsIdx = 0;
-  let pending = { logo: null, shirtImg: null, shirtBack: null, holdBg: null, audio: null };
+  let pending = { logo: null, shirtImg: null, shirtBack: null, holdBg: null, audio: null, bg: null };
   let galItems = []; // { url } already saved, or { file, preview } waiting to upload
   const hasExtra = () => A().length > 0 && 'extra' in A()[0];
   const hasShop = () => 'shop' in G();
@@ -235,7 +242,7 @@
   function setPreview(img, url){ const u = safeUrl(url); if(u){ img.src = u; img.classList.add('show'); } else { img.removeAttribute('src'); img.classList.remove('show'); } }
 
   function openCMS(){
-    pending = { logo: null, shirtImg: null, shirtBack: null, holdBg: null, audio: null };
+    pending = { logo: null, shirtImg: null, shirtBack: null, holdBg: null, audio: null, bg: null };
     show(ov, true);
     const g = G(), shop = shopOf(g);
     $('#g-ig-url').value = g.ig_url || '';
@@ -263,7 +270,7 @@
       const lbl = document.createElement('button'); lbl.type = 'button';
       lbl.className = 'art-sort-label' + (i === cmsIdx ? ' active' : '');
       lbl.textContent = `#${i + 1} ${art.name || 'Untitled'}`;
-      lbl.addEventListener('click', () => { cmsIdx = i; pending.shirtImg = pending.shirtBack = pending.holdBg = pending.audio = null; renderTabs(); loadEditor(i); });
+      lbl.addEventListener('click', () => { cmsIdx = i; pending.shirtImg = pending.shirtBack = pending.holdBg = pending.audio = pending.bg = null; renderTabs(); loadEditor(i); });
       const up = document.createElement('button'); up.type = 'button'; up.className = 'sort-btn'; up.textContent = '↑'; up.disabled = i === 0; up.setAttribute('aria-label', 'Move up');
       up.addEventListener('click', () => moveArticle(i, -1));
       const dn = document.createElement('button'); dn.type = 'button'; dn.className = 'sort-btn'; dn.textContent = '↓'; dn.disabled = i === A().length - 1; dn.setAttribute('aria-label', 'Move down');
@@ -308,6 +315,7 @@
     ['a-price', 'a-fabric', 'a-fit', 'a-story', 'f-gallery', 'a-deer-mode', 'a-deer-x', 'a-deer-y', 'a-deer-size'].forEach(id => { $('#' + id).disabled = !ok; });
     galItems = (Array.isArray(ex.gallery) ? ex.gallery : []).filter(safeUrl).map(url => ({ url }));
     renderGallery();
+    setPreview($('#pv-bg'), ex.bg); $('#f-bg').disabled = !ok;
     setPreview($('#pv-shirt'), a.shirt_img); setPreview($('#pv-shirt-back'), a.shirt_back_img); setPreview($('#pv-hold-bg'), a.hold_bg);
     $('#audio-note').textContent = a.audio_url ? '✓ Audio file uploaded' : 'No audio set';
   }
@@ -332,6 +340,8 @@
     }
     renderGallery();
   });
+  $('#f-bg').addEventListener('change', e => { const f = e.target.files[0]; if(f) pick(f, 'bg', 'pv-bg', { maxW: 2000, maxH: 2000, quality: .8, maxKB: 500 }); });
+  $('#remove-bg-btn').addEventListener('click', () => { pending.bg = '__remove__'; setPreview($('#pv-bg'), ''); });
   $('#remove-logo-btn').addEventListener('click', () => { pending.logo = '__remove__'; setPreview($('#pv-logo'), ''); });
 
   $('#addArtBtn').addEventListener('click', async () => {
@@ -384,6 +394,10 @@
       if(pending.holdBg) holdBg = await uploadFile(pending.holdBg, `holdbg_${art.id}_${t}.${ext(pending.holdBg)}`);
       if(pending.audio) audio = await uploadFile(pending.audio, `audio_${art.id}_${t}.${ext(pending.audio)}`);
 
+      let bgUrl = extraOf(art).bg || null;
+      if(pending.bg === '__remove__') bgUrl = null;
+      else if(pending.bg) bgUrl = await uploadFile(pending.bg, `bg_${art.id}_${t}.${ext(pending.bg)}`);
+
       const gallery = [];
       for(const [k, it] of galItems.entries()){ gallery.push(it.file ? await uploadFile(it.file, `gallery_${art.id}_${t}_${k}.${ext(it.file)}`) : it.url); }
 
@@ -393,11 +407,11 @@
       Santai.state.g = { ...g, ...ng };
 
       const na = { name: $('#a-name').value, sub: $('#a-sub').value, description: $('#a-desc').value, hold_color: $('#a-hold-color').value, sizes: $('#a-sizes').value, avail_status: $('#a-avail').value, shirt_img: shirt, shirt_back_img: shirtBack, hold_bg: holdBg, audio_url: audio };
-      if(hasExtra()) na.extra = { ...extraOf(art), price: $('#a-price').value.trim(), fabric: $('#a-fabric').value.trim(), fit: $('#a-fit').value.trim(), story: $('#a-story').value.trim(), gallery, deer: deerSpot() };
+      if(hasExtra()) na.extra = { ...extraOf(art), price: $('#a-price').value.trim(), fabric: $('#a-fabric').value.trim(), fit: $('#a-fit').value.trim(), story: $('#a-story').value.trim(), gallery, deer: deerSpot(), bg: bgUrl };
       await sbPatch('santai_articles', `id=eq.${art.id}`, na);
       A()[cmsIdx] = { ...art, ...na };
 
-      pending = { logo: null, shirtImg: null, shirtBack: null, holdBg: null, audio: null };
+      pending = { logo: null, shirtImg: null, shirtBack: null, holdBg: null, audio: null, bg: null };
       cache(); Santai.render(); renderTabs(); loadEditor(cmsIdx);
       btn.textContent = 'SAVE ALL CHANGES'; btn.disabled = false;
       conf.classList.add('show'); setTimeout(() => conf.classList.remove('show'), 3000);

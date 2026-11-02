@@ -18,6 +18,7 @@
 <body id="top">
 <a class="skip" href="#collection">Skip to the shirts</a>
 <div id="cursor"></div>
+<div class="scene-bg" id="sceneBg" aria-hidden="true"></div>
 <div class="grain"></div>
 <div id="hold-layer"></div>
 <canvas id="deerCanvas" aria-hidden="true"></canvas>
@@ -40,14 +41,13 @@
     <a class="hdr-ig" data-ig href="https://instagram.com/santai.memorabilia" target="_blank" rel="noopener noreferrer" aria-label="SANTAI on Instagram">
       <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/></svg>
     </a>
-    <a class="hdr-link hdr-order" href="#orderBand">Order</a>
+    <a class="hdr-link hdr-order" href="#how-to-order" data-how-to-order>Order</a>
   </div>
 </header>
 
 <main id="main">
   <section class="intro" id="intro" aria-label="SANTAI">
     <p class="sr-only">A deer grazes. Scroll to follow it to the shirts.</p>
-    <p class="intro-hint" aria-hidden="true">Scroll</p>
   </section>
 
   <div class="stage-msg" id="stageMsg" role="status">
@@ -55,38 +55,25 @@
     <button id="stageRetry" type="button" hidden>Try again</button>
   </div>
 
-  <div class="marquee" id="marquee" hidden>
-    <div class="marquee-track" id="marqueeTrack"></div>
-    <button class="marquee-btn" id="motionBtn" type="button" aria-pressed="false">Pause</button>
-  </div>
-
   <div class="collection" id="collection" tabindex="-1"></div>
-
-  <section class="band" id="orderBand" aria-labelledby="orderTitle" hidden>
-    <div class="band-grid">
-      <h2 class="band-title" id="orderTitle">Order</h2>
-      <div class="band-body">
-        <p class="band-lede" id="bandHow"></p>
-        <div class="band-actions">
-          <a class="btn-inv" id="bandWa" href="https://wa.me/" target="_blank" rel="noopener noreferrer" hidden>Message on WhatsApp</a>
-          <a class="btn-inv ghost" id="bandIg" href="https://ig.me/m/santai.memorabilia" target="_blank" rel="noopener noreferrer">Message on Instagram</a>
-        </div>
-      </div>
-    </div>
-    <div class="band-info" id="bandInfo" hidden>
-      <div id="shipBlock" hidden><h3>Shipping</h3><p id="shipText"></p></div>
-      <div id="retBlock" hidden><h3>Returns</h3><p id="retText"></p></div>
-    </div>
-    <div class="band-foot">
-      <span>&copy; <span id="year"></span> SANTAI</span>
-      <nav aria-label="Footer">
-        <a href="sizechart.html">Size chart</a>
-        <a data-ig href="https://instagram.com/santai.memorabilia" target="_blank" rel="noopener noreferrer">Instagram</a>
-        <a href="#top">Back to top</a>
-      </nav>
-    </div>
-  </section>
 </main>
+
+<footer class="site-foot" id="footer">
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <p class="foot-word">SANTAI</p>
+      <p class="foot-sub">shirt &amp; memorabilia</p>
+    </div>
+    <nav class="foot-nav" aria-label="Footer">
+      <ul class="foot-list" id="footShirts"></ul>
+      <ul class="foot-list">
+        <li><a href="sizechart.html">Size chart</a></li>
+        <li><a href="#how-to-order" data-how-to-order>How to order</a></li>
+      </ul>
+    </nav>
+  </div>
+  <p class="foot-giant" aria-hidden="true">SANTAI</p>
+</footer>
 
 <div class="drawer" id="drawer" hidden>
   <div class="drawer-backdrop" id="drawerBackdrop"></div>

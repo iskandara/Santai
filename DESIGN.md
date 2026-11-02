@@ -32,11 +32,11 @@ Theme: light, with one dark band. The garment photos are shot on light grounds a
 
 ## Layout and rhythm
 
-- The first screen holds only the deer, grazing in a small meadow. No header, no words except a faint "Scroll".
-- Scrolling sends the deer running down the page. It keeps pace with the scroll, swings across the page, and leaps onto the next shirt. Scrolling up sends it back.
-- Each shirt fills one screen: the photo plate and the name. Price, sizes, story and ordering live in a details panel that opens when the shirt is clicked.
-- Shirts alternate sides. A marquee of the CMS running text sits after the first shirt.
-- The page ends in the dark order band: a huge "Order", the ways to message, then shipping and returns.
+- The first screen holds only the deer, grazing in a small meadow. No header, no words.
+- Scrolling sends the deer running down the page. It keeps pace with the scroll, swings across the page, and lands on the next shirt. Scrolling up sends it back.
+- Each shirt fills one screen, large, on no plate. No name, number or price on the page; the cursor reads "Details" over a shirt, and a click opens the details panel (photos, price, story, sizes, order).
+- Behind each shirt, the painting it comes from fades in softly while that shirt is in the middle of the screen (at most 32% strength), and fades out as you leave it.
+- The footer is the painted hills: SANTAI and "shirt & memorabilia" with links to each shirt, the size chart and How to order, and the name set huge where the land meets the page.
 
 ## Motifs
 
@@ -46,14 +46,13 @@ Theme: light, with one dark band. The garment photos are shot on light grounds a
   - **Stand**: it stands on the shirt.
 - **Hold and turn.** Press and hold a shirt and the page falls away to the shirt's own colour while it turns. A quick click opens the details instead.
 - **Grain.** A faint film grain (3.5% opacity) keeps flat paper tones from looking like a default screen.
-- **Dot cursor** on desktop only. It becomes a ring over a shirt.
-- **Catalogue numbers.** "No. 01 / 02" on every shirt.
+- **Dot cursor** on desktop only. Over a shirt it becomes a dark disc reading "Details".
 
 ## Motion
 
 - The deer is the one orchestrated motion. Everything else enters once: a short rise and fade, and shirt names reveal word by word.
 - Under `prefers-reduced-motion` the deer does not run: it appears at the nearest stop, still.
-- The marquee and the availability pulse loop. Both stop under the Pause control and under `prefers-reduced-motion`.
+- The grazing loop and the availability pulse stop under `prefers-reduced-motion`.
 - The order button fills from below on hover. No parallax, no scroll hijacking.
 
 ## Buying

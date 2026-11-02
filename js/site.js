@@ -63,37 +63,32 @@
     open(`https://ig.me/m/${encodeURIComponent(igHandle(g))}`);
   }
 
-  /* ────────── global bits: logo, links, marquee, order band ────────── */
-  const collection = $('#collection'), marquee = $('#marquee');
+  /* ────────── global bits: logo and links ────────── */
+  const collection = $('#collection');
   function applyGlobal(){
     const g = Santai.state.g;
     const logo = safeUrl(g.logo_img), li = $('#logoImg'), lt = $('#logoText');
     if(logo){ li.src = logo; li.classList.add('show'); lt.style.display = 'none'; }
     else { li.classList.remove('show'); lt.style.display = ''; }
-
     const ig = safeUrl((g.ig_url || '').trim()) || DEFAULT_IG_URL;
     $$('[data-ig]').forEach(a => { a.href = ig; });
-    $('#bandIg').href = `https://ig.me/m/${encodeURIComponent(igHandle(g))}`;
+  }
 
-    const wa = waNumber(g), shop = shopOf(g);
-    const waBtn = $('#bandWa');
-    waBtn.hidden = !wa;
-    if(wa) waBtn.href = `https://wa.me/${wa}`;
-
-    // Marquee: the CMS running text, repeated so the loop never shows a gap
-    const items = (g.ticker || '').split('|').map(s => s.trim()).filter(Boolean);
-    marquee.hidden = !items.length;
-    const track = $('#marqueeTrack'); track.textContent = '';
-    for(let i = 0; i < 4; i++) items.forEach(t => track.append(h('span', { class: 'marquee-item', text: t })));
-
-    // Shipping and returns only show when there is something real to say
+  /* ────────── how to order: the ways to message, then shipping and returns ────────── */
+  function buildHowTo(){
+    const g = Santai.state.g, wa = waNumber(g), shop = shopOf(g);
     const ship = (shop.shipping || '').trim(), ret = (shop.returns || '').trim();
-    $('#shipText').textContent = ship; $('#shipBlock').hidden = !ship;
-    $('#retText').textContent = ret;  $('#retBlock').hidden = !ret;
-    $('#bandInfo').hidden = !ship && !ret;
-    $('#bandHow').textContent = wa
-      ? 'Click a shirt, pick a size, and the message writes itself. Or message us directly.'
-      : 'Click a shirt, pick a size, and we copy the message for you. Or message us directly on Instagram.';
+    return h('div', { class: 'details how' },
+      h('div', { class: 'details-body' },
+        h('h2', { class: 'details-name', id: 'drawerTitle', text: 'How to order' }),
+        h('p', { class: 'story', text: wa
+          ? 'Click a shirt, pick a size, and press Order. WhatsApp opens with the message written for you. Or message us directly.'
+          : 'Click a shirt, pick a size, and press Order. We copy the message for you and open Instagram. Or message us directly.' }),
+        h('div', { class: 'how-actions' },
+          wa ? h('a', { class: 'cta cta-link', href: `https://wa.me/${wa}`, target: '_blank', rel: 'noopener noreferrer', text: 'Message on WhatsApp' }) : null,
+          h('a', { class: 'cta cta-link ghost', href: `https://ig.me/m/${encodeURIComponent(igHandle(g))}`, target: '_blank', rel: 'noopener noreferrer', text: 'Message on Instagram' })),
+        ship ? h('div', { class: 'how-block' }, h('h3', { text: 'Shipping' }), h('p', { text: ship })) : null,
+        ret ? h('div', { class: 'how-block' }, h('h3', { text: 'Returns' }), h('p', { text: ret })) : null));
   }
 
   /* ────────── one piece on the page: the shirt and its name, nothing else ────────── */
@@ -107,7 +102,7 @@
       class: 'plate', 'data-reveal': '', role: 'button', tabindex: '0', 'aria-haspopup': 'dialog',
       'aria-label': `${name}. Open price, sizes and details`,
       // where the deer lands on this photo: its anchor (% across, % down), its width (% of the photo), and whether
-      // it stands on the shirt or jumps into the print and becomes the deer already printed there
+      // it stands on the shirt, jumps into a print that already shows it, or hides while the print's herd walks in
       'data-land-x': num(land.x, 50, 0, 100), 'data-land-y': num(land.y, 56, 0, 100), 'data-land-size': num(land.size, 40, 5, 100),
       'data-land-mode': ['into', 'herd'].includes(land.mode) ? land.mode : 'stand'
     });
@@ -119,26 +114,17 @@
       plate.append(fimg);
     } else plate.insertAdjacentHTML('afterbegin', PLACEHOLDER_SVG);
     if(back) plate.append(h('img', { class: 'plate-img plate-back', src: back, alt: `${name}, back`, width: 3, height: 4, decoding: 'async', draggable: 'false', loading: 'lazy' }));
-    plate.append(h('span', { class: 'plate-no', text: `No. ${pad2(i + 1)}` }), h('span', { class: 'plate-deg', 'aria-hidden': 'true', text: '0°' }));
+    plate.append(h('span', { class: 'plate-deg', 'aria-hidden': 'true', text: '0°' }));
 
-    const nameEl = h('h2', { class: 'name', id: `name-${art.id}` });
-    String(name).split(/\s+/).forEach((w, k) => {
-      const word = h('span', { class: 'w' }, h('span', { text: w }));
-      word.firstChild.style.setProperty('--d', (k * 90) + 'ms');
-      nameEl.append(word, ' ');
-    });
+    // The page shows only the shirt. The name stays for screen readers and the page outline.
+    const piece = h('section', { class: 'piece', id: `piece-${art.id}`, 'aria-labelledby': `name-${art.id}` },
+      h('h2', { class: 'sr-only', id: `name-${art.id}`, text: name }),
+      h('div', { class: 'piece-plate' }, plate));
 
-    const info = h('div', { class: 'piece-info' },
-      h('p', { class: 'row-label', 'data-reveal': '' }, h('span', { text: `No. ${pad2(i + 1)} / ${pad2(total)}` })),
-      nameEl,
-      art.sub && art.sub.trim() ? h('p', { class: 'sub', 'data-reveal': '', text: art.sub }) : null,
-      h('p', { class: 'piece-hint', 'data-reveal': '' },
-        h('span', { class: 'fine-pointer', text: 'Click the shirt for price and sizes' }),
-        h('span', { class: 'coarse-pointer', text: 'Tap the shirt for price and sizes' }))
-    );
+    // The painting behind this shirt, if the editor set one. It fades in as the shirt comes into view.
+    const bg = safeUrl(ex.bg);
+    if(bg){ const layerEl = h('div', { class: 'scene-bg-layer' }); layerEl.style.backgroundImage = `url("${bg}")`; $('#sceneBg').append(layerEl); bgLayers.push({ piece, el: layerEl }); }
 
-    const piece = h('section', { class: `piece${i % 2 === 1 ? ' is-flip' : ''}`, id: `piece-${art.id}`, 'aria-labelledby': `name-${art.id}` },
-      h('div', { class: 'piece-plate' }, plate), info);
     wirePlate(plate, art, i);
     return piece;
   }
@@ -179,7 +165,7 @@
       photos.length ? h('div', { class: 'gal', role: 'region', 'aria-label': `Photos of ${name}`, tabindex: '0' },
         photos.map(p => h('figure', {}, h('img', { src: p.u, alt: p.alt, width: 4, height: 5, decoding: 'async', draggable: 'false' })))) : null,
       h('div', { class: 'details-body' },
-        h('p', { class: 'row-label' }, h('span', { text: `No. ${pad2(i + 1)}` }), h('span', { class: `status ${st.cls}` }, h('i'), st.text)),
+        h('p', { class: 'row-label' }, h('span', { class: `status ${st.cls}` }, h('i'), st.text)),
         h('h2', { class: 'details-name', id: 'drawerTitle', text: name }),
         art.sub && art.sub.trim() ? h('p', { class: 'sub', text: art.sub }) : null,
         price ? h('p', { class: 'price', text: price }) : h('p', { class: 'price ask', text: 'Message us for the price' }),
@@ -197,10 +183,11 @@
     return wrap;
   }
 
-  function openDetails(art, i){
+  function openDetails(art, i){ openPanel(buildDetails(art, i)); }
+  function openPanel(content){
     lastFocus = document.activeElement;
     drawerBody.textContent = '';
-    drawerBody.append(buildDetails(art, i));
+    drawerBody.append(content);
     drawerBody.scrollTop = 0;
     drawer.hidden = false;
     root.classList.add('drawer-open');
@@ -215,6 +202,7 @@
     if(lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   }
   $('#drawerClose').addEventListener('click', closeDetails);
+  document.addEventListener('click', e => { const a = e.target.closest('[data-how-to-order]'); if(a){ e.preventDefault(); openPanel(buildHowTo()); } });
   $('#drawerBackdrop').addEventListener('click', closeDetails);
   document.addEventListener('keydown', e => {
     if(drawer.hidden) return;
@@ -293,19 +281,19 @@
 
   /* ────────── render the whole collection ────────── */
   let revealIO = null;
+  const bgLayers = [];
   function render(){
     const { a: articles } = Santai.state;
     applyGlobal();
     collection.textContent = '';
+    $('#sceneBg').textContent = ''; bgLayers.length = 0;
     if(revealIO) revealIO.disconnect();
 
     showStage(articles.length ? 'ok' : 'empty');
-    articles.forEach((art, i) => {
-      collection.append(buildPiece(art, i, articles.length));
-      if(i === 0) collection.append(marquee);
-    });
-    if(!articles.length) $('#main').insertBefore(marquee, collection);
-    $('#orderBand').hidden = !articles.length;
+    articles.forEach((art, i) => collection.append(buildPiece(art, i, articles.length)));
+    const list = $('#footShirts'); list.textContent = '';
+    articles.forEach(art => list.append(h('li', {}, h('a', { href: `#piece-${art.id}`, text: art.name || 'Untitled' }))));
+    updateBackdrop();
 
     revealIO = new IntersectionObserver((entries, io) => entries.forEach(en => { if(en.isIntersecting){ en.target.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px', threshold: .08 });
     $$('[data-reveal], .name', collection).forEach((el, k) => { if(el.dataset.reveal !== undefined) el.style.setProperty('--d', (k % 4) * 80 + 'ms'); revealIO.observe(el); });
@@ -324,27 +312,30 @@
   /* ────────── header: hidden while only the deer is on screen ────────── */
   const header = $('.site-header');
   let ticking = false;
+  /* the painting behind the shirt in view: full strength only when the shirt sits in the middle, and even then quiet */
+  const BG_MAX = .32;
+  function updateBackdrop(){
+    const mid = innerHeight / 2;
+    bgLayers.forEach(({ piece, el }) => {
+      const r = piece.getBoundingClientRect(), d = Math.abs(r.top + r.height / 2 - mid) / innerHeight;
+      el.style.opacity = (Math.max(0, 1 - d * 1.7) * BG_MAX).toFixed(3);
+    });
+  }
   function onScroll(){
     ticking = false;
+    updateBackdrop();
     header.classList.toggle('is-scrolled', scrollY > 24);
     root.classList.toggle('at-intro', scrollY < innerHeight * .45);
   }
   addEventListener('scroll', () => { if(!ticking){ ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
   onScroll();
 
-  const motionBtn = $('#motionBtn');
-  motionBtn.addEventListener('click', () => {
-    const paused = root.classList.toggle('motion-paused');
-    motionBtn.setAttribute('aria-pressed', String(paused));
-    motionBtn.textContent = paused ? 'Play' : 'Pause';
-  });
-
   const cursorEl = $('#cursor');
   addEventListener('mousemove', e => { cursorEl.style.left = e.clientX + 'px'; cursorEl.style.top = e.clientY + 'px'; }, { passive: true });
   document.addEventListener('mouseover', e => {
     cursorEl.classList.toggle('over', !!e.target.closest('a,button,select,label,summary,input,[role="button"]:not(.plate)'));
     cursorEl.classList.toggle('ring', !!e.target.closest('.plate'));
-    cursorEl.classList.toggle('on-dark', !!e.target.closest('.band, .drawer'));
+    cursorEl.classList.toggle('on-dark', !!e.target.closest('.drawer'));
   });
 
   /* ────────── loading and start ────────── */
@@ -375,6 +366,5 @@
   }
   addEventListener('hashchange', maybeLoadCMS);
 
-  $('#year').textContent = new Date().getFullYear();
   start().then(maybeLoadCMS);
 })();
