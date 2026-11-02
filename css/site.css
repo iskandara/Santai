@@ -304,3 +304,10 @@ a.wordmark{color:var(--ink);text-decoration:none}
   .sz-guide-grid{grid-template-columns:1fr}
   .sz-figure svg{max-width:300px;margin:0 auto}
 }
+
+/* touch screens: a quiet line under each shirt, since there is no hover cursor to say "Details" */
+.tap-hint{display:none}
+@media(pointer:coarse){
+  .piece{flex-direction:column;gap:.85rem}
+  .tap-hint{display:block;font-size:.6875rem;letter-spacing:.2em;padding-left:.2em;text-transform:uppercase;color:var(--mute)}
+}
