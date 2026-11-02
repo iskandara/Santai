@@ -36,7 +36,8 @@ Theme: light, with one dark band. The garment photos are shot on light grounds a
 - Scrolling sends the deer running down the page. It keeps pace with the scroll, swings across the page, and lands on the next shirt. Scrolling up sends it back.
 - Each shirt fills one screen, large, on no plate. No name, number or price on the page; the cursor reads "Details" over a shirt, and a click opens the details panel (photos, price, story, sizes, order).
 - Behind each shirt, the painting it comes from fades in softly while that shirt is in the middle of the screen (at most 32% strength), and fades out as you leave it.
-- The footer is the painted hills: SANTAI and "shirt & memorabilia" with links to each shirt, the size chart and How to order, and the name set huge where the land meets the page.
+- After the last shirt the deer comes back out and rests, grazing, on the footer's hills. Scroll on and it stops, leaves a few droppings, and runs for the horizon, smaller and smaller until it is gone. Scrolling back up brings it back.
+- The footer is the painted hills (image at 90%, the giant SANTAI at 45% white): SANTAI and "shirt & memorabilia" with links to each shirt, the size chart and How to order, and the name set huge where the land meets the page.
 
 ## Motifs
 
