@@ -343,7 +343,12 @@
     $('#loading-bar').style.width = '100%';
     setTimeout(() => { const s = $('#loading'); s.classList.add('fade'); setTimeout(() => { s.style.display = 'none'; }, 650); }, 250);
   }
-  Santai.onChange.push(() => { render(); hideLoading(); });
+  let howToShown = false;
+  Santai.onChange.push(() => {
+    render(); hideLoading();
+    // arriving from another page's "How to order" link
+    if(!howToShown && location.hash === '#how-to-order'){ howToShown = true; openPanel(buildHowTo()); }
+  });
   Santai.render = render;
   Santai.applyGlobal = applyGlobal;
 
