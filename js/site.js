@@ -91,9 +91,21 @@
         ret ? h('div', { class: 'how-block' }, h('h3', { text: 'Returns' }), h('p', { text: ret })) : null));
   }
 
+  /* Built-in settings for the shirts the site was designed around, so the deer and the paintings work
+     even before anything is saved in the editor. Anything saved in the editor wins.
+     The deer numbers are measured on the product photos SANTAI supplied (2000x1333 and 1681x1462). */
+  const PRESETS = {
+    deercomesthesun: { bg: 'img/bg-deer-comes.webp', deer: { mode: 'into', x: 49.63, y: 48.71, size: 15.33 } },
+    howdeerisyourlove: { bg: 'img/bg-how-deer.webp', deer: { mode: 'herd', x: 40.571, y: 21.751, size: 13.325 } },
+  };
+  const presetFor = name => PRESETS[String(name || '').toLowerCase().replace(/[^a-z]/g, '')] || {};
+
   /* ────────── one piece on the page: the shirt and its name, nothing else ────────── */
   function buildPiece(art, i, total){
-    const ex = extraOf(art), land = ex.deer || {};
+    const ex = extraOf(art), preset = presetFor(art.name);
+    // a saved landing counts only if someone chose it: the editor's untouched default ("stand", no position) does not
+    const d = ex.deer || {}, chosen = d.mode && (d.mode !== 'stand' || d.x != null || d.y != null || d.size != null);
+    const land = chosen ? d : (preset.deer || d);
     const front = safeUrl(art.shirt_img), back = safeUrl(art.shirt_back_img);
     const name = art.name || 'Untitled';
 
@@ -124,7 +136,7 @@
       h('p', { class: 'tap-hint', 'aria-hidden': 'true', text: 'Tap for details' }));
 
     // The painting behind this shirt, if the editor set one. It fades in as the shirt comes into view.
-    const bg = safeUrl(ex.bg);
+    const bg = safeUrl(ex.bg) || preset.bg || '';   // preset paths are our own files, not database text
     if(bg){ const layerEl = h('div', { class: 'scene-bg-layer' }); layerEl.style.backgroundImage = `url("${bg}")`; $('#sceneBg').append(layerEl); bgLayers.push({ piece, el: layerEl }); }
 
     wirePlate(plate, art, i);
