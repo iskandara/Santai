@@ -119,7 +119,9 @@
     // The page shows only the shirt. The name stays for screen readers and the page outline.
     const piece = h('section', { class: 'piece', id: `piece-${art.id}`, 'aria-labelledby': `name-${art.id}` },
       h('h2', { class: 'sr-only', id: `name-${art.id}`, text: name }),
-      h('div', { class: 'piece-plate' }, plate));
+      h('div', { class: 'piece-plate' }, plate),
+      // touch screens have no "Details" cursor, so they get one quiet line instead (CSS shows it only there)
+      h('p', { class: 'tap-hint', 'aria-hidden': 'true', text: 'Tap for details' }));
 
     // The painting behind this shirt, if the editor set one. It fades in as the shirt comes into view.
     const bg = safeUrl(ex.bg);
